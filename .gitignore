@@ -1,0 +1,17 @@
+cat << 'EOF' > .gitignore
+# C++ build artifacts
+_skbuild/
+build/
+*.so
+*.o
+
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# IDEs and OS
+.vscode/
+.idea/
+.DS_Store
+EOF
