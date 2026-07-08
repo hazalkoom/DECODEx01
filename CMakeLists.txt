@@ -3,5 +3,6 @@ project(DECODEx01Core)
 
 find_package(pybind11 CONFIG REQUIRED)
 
-pybind11_add_module(codelens_core src/bindings.cpp)
+pybind11_add_module(codelens_core src/bindings.cpp src/fs_walker.cpp)
+
 install(TARGETS codelens_core DESTINATION .)
