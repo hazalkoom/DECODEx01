@@ -14,3 +14,7 @@ dependencies = [
 [build-system]
 requires = ["scikit-build-core", "pybind11"]
 build-backend = "scikit_build_core.build"
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)"
+]
