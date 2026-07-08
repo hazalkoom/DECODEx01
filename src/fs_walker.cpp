@@ -39,13 +39,16 @@ bool should_skip(const std::string& dir_name) {
 std::vector<std::string> walk_repository(const std::string& root_path) {
     std::vector<std::string> discovered_files;
 
+    auto options = fs::directory_options::skip_permission_denied;
+
     try {
-        for (auto it = fs::recursive_directory_iterator(root_path); it != fs::recursive_directory_iterator(); ++it) {
+
+        for (auto it = fs::recursive_directory_iterator(root_path, options); it != fs::recursive_directory_iterator(); ++it) {
             const auto& entry = *it;
             std::string filename = entry.path().filename().string();
 
             if (entry.is_directory() && should_skip(filename)) {
-                it.disable_recursion_pending(); // Skip scanning inside this folder
+                it.disable_recursion_pending(); 
                 continue;
             }
 
@@ -54,7 +57,7 @@ std::vector<std::string> walk_repository(const std::string& root_path) {
             }
         }
     } catch (const fs::filesystem_error& e) {
-        // Silently skip permission errors
+        // This will now only catch catastrophic disk errors, not standard permission walls
     }
 
     return discovered_files;
