@@ -113,6 +113,8 @@ pybind11_add_module(codelens_core
     src/fs_walker.cpp 
     src/language_detector.cpp
     src/ast_parser.cpp 
+    src/symbol_extractor.cpp
+    src/dependency_extractor.cpp
     
     # Core
     ${tree-sitter_SOURCE_DIR}/lib/src/lib.c

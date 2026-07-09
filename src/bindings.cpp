@@ -16,9 +16,17 @@ PYBIND11_MODULE(codelens_core, m) {
         .def_readonly("start_line", &Symbol::start_line)
         .def_readonly("end_line", &Symbol::end_line);
 
+    // NEW: Expose Dependency object to Python
+    py::class_<Dependency>(m, "Dependency")
+        .def_readonly("module_name", &Dependency::module_name)
+        .def_readonly("imported_name", &Dependency::imported_name)
+        .def_readonly("line_number", &Dependency::line_number);
+
     py::class_<ASTParser>(m, "ASTParser")
         .def(py::init<>())
-        // NEW: We now pass the language name string!
-        .def("set_language", &ASTParser::set_language, "Sets the active parser grammar (e.g., 'python', 'javascript')")
-        .def("parse_code", &ASTParser::parse_code, "Parses source code and extracts functions and classes.");
+        .def("set_language", &ASTParser::set_language)
+        // Renamed to match the new architecture
+        .def("extract_symbols", &ASTParser::extract_symbols, "Extracts functions and classes.")
+        // NEW:
+        .def("extract_dependencies", &ASTParser::extract_dependencies, "Extracts imports and includes.");
 }
