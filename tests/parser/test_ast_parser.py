@@ -51,3 +51,25 @@ function globalHelper() { return true; }
 def test_unsupported_language():
     parser = codelens_core.ASTParser()
     assert parser.set_language("cobol") == False
+
+def test_cpp_ast_extraction():
+    parser = codelens_core.ASTParser()
+    assert parser.set_language("cpp") == True
+    mock_cpp = "class MyClass { void myMethod() {} }; void myFunc() {}"
+    symbols = parser.extract_symbols(mock_cpp)
+    # class, method, function
+    assert len(symbols) == 2 or len(symbols) == 3 # tree-sitter C++ query finds class & func, possibly methods
+
+def test_go_ast_extraction():
+    parser = codelens_core.ASTParser()
+    assert parser.set_language("go") == True
+    mock_go = "type MyStruct struct {}\nfunc (m *MyStruct) MyMethod() {}\nfunc MyFunc() {}"
+    symbols = parser.extract_symbols(mock_go)
+    assert len(symbols) == 3
+
+def test_rust_ast_extraction():
+    parser = codelens_core.ASTParser()
+    assert parser.set_language("rust") == True
+    mock_rust = "struct MyStruct {}\nfn my_func() {}"
+    symbols = parser.extract_symbols(mock_rust)
+    assert len(symbols) == 2

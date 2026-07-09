@@ -109,12 +109,12 @@ endif()
 find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(codelens_core 
-    src/bindings.cpp 
-    src/fs_walker.cpp 
-    src/language_detector.cpp
-    src/ast_parser.cpp 
-    src/symbol_extractor.cpp
-    src/dependency_extractor.cpp
+    src/api/bindings.cpp 
+    src/core/fs_walker.cpp 
+    src/core/language_detector.cpp
+    src/parser/ast_parser.cpp 
+    src/parser/symbol_extractor.cpp
+    src/parser/dependency_extractor.cpp
     
     # Core
     ${tree-sitter_SOURCE_DIR}/lib/src/lib.c
@@ -148,6 +148,9 @@ pybind11_add_module(codelens_core
 target_include_directories(codelens_core PRIVATE 
     ${tree-sitter_SOURCE_DIR}/lib/include
     ${tree-sitter_SOURCE_DIR}/lib/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/api
 )
 
 # Source-specific include path for tree-sitter-yaml to find its vendored

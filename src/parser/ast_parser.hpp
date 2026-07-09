@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <tree_sitter/api.h>
-#include "ast_types.hpp"
+#include "../core/ast_types.hpp"
 
 class ASTParser {
 private:

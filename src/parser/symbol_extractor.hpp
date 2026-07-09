@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <tree_sitter/api.h>
-#include "ast_types.hpp" // Pull in our shared data types
+#include "../core/ast_types.hpp" // Pull in our shared data types
 
 class SymbolExtractor {
 public:

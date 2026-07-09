@@ -1,8 +1,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "fs_walker.hpp"
-#include "language_detector.hpp"
-#include "ast_parser.hpp"
+#include "../core/fs_walker.hpp"
+#include "../core/language_detector.hpp"
+#include "../parser/ast_parser.hpp"
 
 namespace py = pybind11;
 
