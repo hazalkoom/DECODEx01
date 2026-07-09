@@ -108,8 +108,7 @@ endif()
 # --- 4. COMPILE EVERYTHING ---
 find_package(pybind11 CONFIG REQUIRED)
 
-pybind11_add_module(codelens_core 
-    src/api/bindings.cpp 
+add_library(codelens_lib STATIC
     src/core/fs_walker.cpp 
     src/core/language_detector.cpp
     src/parser/ast_parser.cpp 
@@ -144,14 +143,19 @@ pybind11_add_module(codelens_core
     ${tree-sitter-yaml_SOURCE_DIR}/src/scanner.cc
 )
 
-# THE HEADER COLLISION FIX: Only include the master Tree-sitter core rulebook!
-target_include_directories(codelens_core PRIVATE 
+# Position Independent Code is required for linking static libs into python modules
+set_target_properties(codelens_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_include_directories(codelens_lib PUBLIC 
     ${tree-sitter_SOURCE_DIR}/lib/include
     ${tree-sitter_SOURCE_DIR}/lib/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/parser
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/api
 )
+
+pybind11_add_module(codelens_core src/api/bindings.cpp)
+target_link_libraries(codelens_core PRIVATE codelens_lib)
+target_include_directories(codelens_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/api)
 
 # Source-specific include path for tree-sitter-yaml to find its vendored
 # <tree_sitter/parser.h> without globally polluting include paths for other grammars
@@ -162,3 +166,25 @@ set_source_files_properties(
 )
 
 install(TARGETS codelens_core DESTINATION .)
+
+# --- 5. GOOGLE TEST & C++ TESTS ---
+option(BUILD_TESTING "Build C++ unit tests" ON)
+if(BUILD_TESTING)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.15.2
+    )
+    # Prevent overriding compiler settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    add_executable(cpp_tests 
+        tests/cpp/test_main.cpp
+        tests/cpp/test_language_detector.cpp
+        tests/cpp/test_fs_walker.cpp
+        tests/cpp/test_ast_parser.cpp
+    )
+    target_link_libraries(cpp_tests PRIVATE codelens_lib gtest_main)
+    target_include_directories(cpp_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/cpp)
+endif()
