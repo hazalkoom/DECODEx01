@@ -22,5 +22,7 @@ editable.verbose = true
 [dependency-groups]
 dev = [
     "pytest (>=9.1.1,<10.0.0)",
-    "scikit-build-core>=0.10.0"
+    "scikit-build-core>=0.10.0",
+    "hypothesis (>=6.156.4,<7.0.0)",
+    "pytest-benchmark (>=5.2.3,<6.0.0)"
 ]
