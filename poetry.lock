@@ -57,6 +57,23 @@ files = [
 ]
 
 [[package]]
+name = "pathspec"
+version = "1.1.1"
+description = "Utility library for gitignore style pattern matching of file paths."
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "pathspec-1.1.1-py3-none-any.whl", hash = "sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189"},
+    {file = "pathspec-1.1.1.tar.gz", hash = "sha256:17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a"},
+]
+
+[package.extras]
+hyperscan = ["hyperscan (>=0.7)"]
+optional = ["typing-extensions (>=4)"]
+re2 = ["google-re2 (>=1.1)"]
+
+[[package]]
 name = "pluggy"
 version = "1.6.0"
 description = "plugin and hook calling mechanisms for python"
@@ -125,6 +142,31 @@ tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 
 [package.extras]
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests", "setuptools", "xmlschema"]
+
+[[package]]
+name = "scikit-build-core"
+version = "1.0.1"
+description = "Build backend for CMake based projects"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "scikit_build_core-1.0.1-py3-none-any.whl", hash = "sha256:1b3a660e819b6a99908f01d1df3fbcc75ef3aaa4c1bbf7d6c88de11d1ff21393"},
+    {file = "scikit_build_core-1.0.1.tar.gz", hash = "sha256:9f3c02e88c7722aa351f17b75758ccf8f8e32537e7a29e8961311777c0b35a40"},
+]
+
+[package.dependencies]
+exceptiongroup = {version = ">=1.0", markers = "python_version < \"3.11\""}
+packaging = ">=23.2"
+pathspec = ">=0.12.0"
+tomli = {version = ">=1.2.2", markers = "python_version < \"3.11\""}
+typing-extensions = {version = ">=4", markers = "python_version < \"3.11\""}
+
+[package.extras]
+hatchling = ["hatchling (>=1.24)"]
+setuptools = ["setuptools (>=43) ; python_version < \"3.9\"", "setuptools (>=45) ; python_version == \"3.9\"", "setuptools (>=49) ; python_version >= \"3.10\" and python_version < \"3.12\"", "setuptools (>=66.1) ; python_version >= \"3.12\""]
+wheel-free-setuptools = ["setuptools (>=70.1) ; python_version >= \"3.8\""]
+wheels = ["cmake", "ninja ; sys_platform != \"win32\""]
 
 [[package]]
 name = "tomli"
@@ -200,4 +242,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "4814d75e2f12df6cd22fe2108aa9b66c02c7c3c84b42c8284abaf0c2ddb0332f"
+content-hash = "fea5bd77ac3eb8755f0d64578aa8f99fc3f4e4738482f77a3691f54e0a019eab"
