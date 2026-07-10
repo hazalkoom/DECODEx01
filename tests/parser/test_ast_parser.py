@@ -1,5 +1,6 @@
 import pytest
 import codelens_core
+import textwrap
 
 def test_python_ast_extraction():
     parser = codelens_core.ASTParser()
@@ -73,3 +74,34 @@ def test_rust_ast_extraction():
     mock_rust = "struct MyStruct {}\nfn my_func() {}"
     symbols = parser.extract_symbols(mock_rust)
     assert len(symbols) == 2
+
+def test_cpp_dependency_extraction():
+    parser = codelens_core.ASTParser()
+    assert parser.set_language("cpp") == True
+
+    # THE FIX: textwrap.dedent automatically strips the invisible indentation!
+    mock_cpp_header = textwrap.dedent("""\
+        #pragma once
+        #include <string>
+        #include <vector>
+        #include <tree_sitter/api.h>
+        #include "../core/ast_types.hpp"
+
+        class ASTParser {
+            TSParser* parser;
+        };
+    """)
+    
+    # Extract Dependencies (Path A)
+    deps = parser.extract_dependencies(mock_cpp_header)
+    
+    # We expect 4 includes
+    assert len(deps) == 4
+    
+    # Check System Includes (<...>)
+    assert deps[0].module_name == "<string>"
+    assert deps[1].module_name == "<vector>"
+    assert deps[2].module_name == "<tree_sitter/api.h>"
+    
+    # Check Local Includes ("...")
+    assert deps[3].module_name == '"../core/ast_types.hpp"'

@@ -41,7 +41,7 @@ bool ASTParser::set_language(const std::string& lang_name) {
     else if (lang_name == "C++" || lang_name == "cpp") {
         current_language = tree_sitter_cpp();
         symbol_query_str = "(class_specifier name: (type_identifier) @class_name) (function_definition declarator: (function_declarator declarator: (identifier) @func_name))";
-        dependency_query_str = "";
+        dependency_query_str = "(preproc_include path: (_) @module_name)";
     }
     else if (lang_name == "Go" || lang_name == "go") {
         current_language = tree_sitter_go();
@@ -66,6 +66,8 @@ bool ASTParser::set_language(const std::string& lang_name) {
         current_language = tree_sitter_yaml();
         symbol_query_str = ""; dependency_query_str = "";
     }
+
+
     else {
         return false; 
     }
