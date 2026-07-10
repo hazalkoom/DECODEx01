@@ -28,19 +28,25 @@ bool ASTParser::set_language(const std::string& lang_name) {
         current_language = tree_sitter_python();
         symbol_query_str = "(class_definition name: (identifier) @class_name) (function_definition name: (identifier) @func_name)";
         
-        // NEW: Tree-sitter query to find 'import x' and 'from x import y'
         dependency_query_str = 
             "(import_statement name: (dotted_name) @module_name) "
-            "(import_from_statement module_name: (dotted_name) @module_name name: (dotted_name) @imported_name)";
+            "(import_statement name: (aliased_import name: (dotted_name) @module_name)) "
+            "(import_from_statement module_name: (_) @module_name)";
     } 
     else if (lang_name == "JavaScript" || lang_name == "javascript") {
         current_language = tree_sitter_javascript();
         symbol_query_str = "(class_declaration name: (identifier) @class_name) (function_declaration name: (identifier) @func_name) (method_definition name: (property_identifier) @func_name)";
-        dependency_query_str = ""; // We will add JS imports later
+        dependency_query_str = 
+            "(import_statement source: (string) @module_name) "
+            "(export_statement source: (string) @module_name)";
     }
     else if (lang_name == "C++" || lang_name == "cpp") {
         current_language = tree_sitter_cpp();
-        symbol_query_str = "(class_specifier name: (type_identifier) @class_name) (function_definition declarator: (function_declarator declarator: (identifier) @func_name))";
+        symbol_query_str = 
+            "(class_specifier name: (type_identifier) @class_name) "
+            "(function_definition declarator: (function_declarator declarator: (identifier) @func_name)) "
+            "(function_definition declarator: (function_declarator declarator: (field_identifier) @func_name))";
+            
         dependency_query_str = "(preproc_include path: (_) @module_name)";
     }
     else if (lang_name == "Go" || lang_name == "go") {

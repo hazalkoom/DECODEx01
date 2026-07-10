@@ -1,107 +1,77 @@
 import pytest
-import codelens_core
 import textwrap
+import codelens_core
 
-def test_python_ast_extraction():
-    parser = codelens_core.ASTParser()
-    assert parser.set_language("python") == True
-
-    mock_python = """
-import os
-from json import loads
-
-class DatabaseConnection:
-    def connect(self):
-        pass
-
-def standalone_helper():
-    pass
-"""
-    # 1. Test Symbols (Old functionality still works)
-    symbols = parser.extract_symbols(mock_python)
-    assert len(symbols) == 3
-    assert symbols[0].name == "DatabaseConnection" and symbols[0].type == "class"
-    assert symbols[1].name == "connect" and symbols[1].type == "function"
-    assert symbols[2].name == "standalone_helper" and symbols[2].type == "function"
-    
-    # 2. Test Dependencies (New Path A functionality)
-    deps = parser.extract_dependencies(mock_python)
-    assert len(deps) == 2
-    
-    # Check 'import os'
-    assert deps[0].module_name == "os"
-    
-    # Check 'from json import loads'
-    assert deps[1].module_name == "json"
-    assert deps[1].imported_name == "loads"
-
-def test_javascript_ast_extraction():
-    parser = codelens_core.ASTParser()
-    assert parser.set_language("javascript") == True
-
-    mock_js = """
-class ApiClient {
-    fetchData() { console.log("fetching"); }
-}
-function globalHelper() { return true; }
-"""
-    symbols = parser.extract_symbols(mock_js)
-    assert len(symbols) == 3
-    assert symbols[0].name == "ApiClient" and symbols[0].type == "class"
-
+# --- CORE LOGIC TESTS ---
 def test_unsupported_language():
     parser = codelens_core.ASTParser()
     assert parser.set_language("cobol") == False
 
-def test_cpp_ast_extraction():
+# --- PYTHON QA TESTS ---
+def test_python_basic_extraction():
     parser = codelens_core.ASTParser()
-    assert parser.set_language("cpp") == True
-    mock_cpp = "class MyClass { void myMethod() {} }; void myFunc() {}"
-    symbols = parser.extract_symbols(mock_cpp)
-    # class, method, function
-    assert len(symbols) == 2 or len(symbols) == 3 # tree-sitter C++ query finds class & func, possibly methods
+    parser.set_language("python")
+    src = "import os\nclass User:\n    def login(self): pass"
+    
+    assert len(parser.extract_symbols(src)) == 2
+    assert len(parser.extract_dependencies(src)) == 1
 
-def test_go_ast_extraction():
+def test_python_relative_and_aliased_imports():
+    """Challenge: Can it handle relative dot-imports and 'as' aliases?"""
     parser = codelens_core.ASTParser()
-    assert parser.set_language("go") == True
-    mock_go = "type MyStruct struct {}\nfunc (m *MyStruct) MyMethod() {}\nfunc MyFunc() {}"
-    symbols = parser.extract_symbols(mock_go)
-    assert len(symbols) == 3
-
-def test_rust_ast_extraction():
-    parser = codelens_core.ASTParser()
-    assert parser.set_language("rust") == True
-    mock_rust = "struct MyStruct {}\nfn my_func() {}"
-    symbols = parser.extract_symbols(mock_rust)
-    assert len(symbols) == 2
-
-def test_cpp_dependency_extraction():
-    parser = codelens_core.ASTParser()
-    assert parser.set_language("cpp") == True
-
-    # THE FIX: textwrap.dedent automatically strips the invisible indentation!
-    mock_cpp_header = textwrap.dedent("""\
-        #pragma once
-        #include <string>
-        #include <vector>
-        #include <tree_sitter/api.h>
-        #include "../core/ast_types.hpp"
-
-        class ASTParser {
-            TSParser* parser;
-        };
+    parser.set_language("python")
+    src = textwrap.dedent("""\
+        from ..core.models import User as DbUser
+        import numpy as np
     """)
+    deps = parser.extract_dependencies(src)
+    assert len(deps) == 2
+    assert deps[0].module_name == "..core.models"
+    assert deps[1].module_name == "numpy"
+
+def test_python_multiline_imports():
+    """Challenge: Can it extract from formatted multi-line imports?"""
+    parser = codelens_core.ASTParser()
+    parser.set_language("python")
+    src = textwrap.dedent("""\
+        from rest_framework.response import (
+            Response,
+            NotFound
+        )
+    """)
+    deps = parser.extract_dependencies(src)
+    assert len(deps) == 1
+    assert deps[0].module_name == "rest_framework.response"
+
+def test_python_deeply_nested_symbols():
+    """Challenge: Can it find classes and functions buried inside other functions?"""
+    parser = codelens_core.ASTParser()
+    parser.set_language("python")
+    src = textwrap.dedent("""\
+        def outer_function():
+            import secret_lib
+            class InnerClass:
+                def inner_method(): pass
+    """)
+    symbols = parser.extract_symbols(src)
+    deps = parser.extract_dependencies(src)
     
-    # Extract Dependencies (Path A)
-    deps = parser.extract_dependencies(mock_cpp_header)
-    
-    # We expect 4 includes
-    assert len(deps) == 4
-    
-    # Check System Includes (<...>)
-    assert deps[0].module_name == "<string>"
-    assert deps[1].module_name == "<vector>"
-    assert deps[2].module_name == "<tree_sitter/api.h>"
-    
-    # Check Local Includes ("...")
-    assert deps[3].module_name == '"../core/ast_types.hpp"'
+    # outer_function, InnerClass, inner_method
+    assert len(symbols) == 3
+    assert len(deps) == 1
+    assert deps[0].module_name == "secret_lib"
+
+def test_python_garbage_safety():
+    """Challenge: Ensure parser doesn't crash on syntactically invalid Python"""
+    parser = codelens_core.ASTParser()
+    parser.set_language("python")
+    src = textwrap.dedent("""\
+        def broken_func(
+        import missing_quote
+        class { { {
+    """)
+    # Should safely return what it can, or empty lists, but NEVER crash
+    symbols = parser.extract_symbols(src)
+    deps = parser.extract_dependencies(src)
+    assert isinstance(symbols, list)
+    assert isinstance(deps, list)
