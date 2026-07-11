@@ -12,6 +12,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA journal_mode=WAL")
     cursor.execute("PRAGMA synchronous=NORMAL")
     cursor.execute("PRAGMA cache_size=-64000") # 64MB Cache
+    cursor.execute("PRAGMA foreign_keys=ON") # Enforce cascade deletes
     cursor.close()
 
 class DBManager:

@@ -2,6 +2,9 @@ from typing import List, Optional
 from sqlalchemy import String, Integer, Float, ForeignKey, Index
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+
+from mutmut.mutation.trampoline import wrap_in_trampoline as _mutmut_mutated, MutantDict
+
 class Base(DeclarativeBase):
     pass
 
