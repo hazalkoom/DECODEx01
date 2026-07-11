@@ -52,12 +52,12 @@ bool ASTParser::set_language(const std::string& lang_name) {
     else if (lang_name == "Go" || lang_name == "go") {
         current_language = tree_sitter_go();
         symbol_query_str = "(type_spec name: (type_identifier) @class_name) (function_declaration name: (identifier) @func_name) (method_declaration name: (field_identifier) @func_name)";
-        dependency_query_str = "";
+        dependency_query_str = "(import_spec path: (interpreted_string_literal) @module_name)";
     }
     else if (lang_name == "Rust" || lang_name == "rust") {
         current_language = tree_sitter_rust();
         symbol_query_str = "(struct_item name: (type_identifier) @class_name) (function_item name: (identifier) @func_name)";
-        dependency_query_str = "";
+        dependency_query_str = "(use_declaration argument: (_) @module_name)";
     }
     else if (lang_name == "Shell" || lang_name == "bash") {
         current_language = tree_sitter_bash();
