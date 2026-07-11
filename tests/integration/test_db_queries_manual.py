@@ -1,4 +1,8 @@
-from src.python.decode_db.query_api import DBQueryAPI
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "src")))
+
+from python.decode_db.query_api import DBQueryAPI
 
 def run_tests():
     api = DBQueryAPI("decode_graph.db")

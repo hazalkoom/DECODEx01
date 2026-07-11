@@ -1,7 +1,11 @@
 import os
+import sys
 import time
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+
 import codelens_core
-from src.python.decode_db.manager import DBManager
+from python.decode_db.manager import DBManager
 
 def run_indexer(target_directory: str, db_name: str = "decode_graph.db"):
     print(f"🚀 Starting Smart Indexer on: {target_directory}")

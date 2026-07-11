@@ -16,7 +16,7 @@
 # =============================================================================
 set -e
 
-PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="$PROJECT_DIR/build/coverage"
 REPORT_DIR="$PROJECT_DIR/coverage_reports"
 

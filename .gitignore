@@ -1,4 +1,3 @@
-cat << 'EOF' > .gitignore
 # C++ build artifacts
 _skbuild/
 build/
@@ -14,4 +13,9 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
-EOFdecode_graph.db*
+
+# Local artifacts and outputs
+coverage_reports/
+mutants/
+.decode/
+decode_graph.db*
