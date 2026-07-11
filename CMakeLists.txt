@@ -106,7 +106,9 @@ endif()
 
 
 # --- 4. COMPILE EVERYTHING ---
-find_package(pybind11 CONFIG REQUIRED)
+
+# Option to skip the Python module (for standalone ASan/coverage builds)
+option(BUILD_PYTHON_MODULE "Build the pybind11 Python module" ON)
 
 add_library(codelens_lib STATIC
     src/core/fs_walker.cpp 
@@ -153,10 +155,6 @@ target_include_directories(codelens_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/parser
 )
 
-pybind11_add_module(codelens_core src/api/bindings.cpp)
-target_link_libraries(codelens_core PRIVATE codelens_lib)
-target_include_directories(codelens_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/api)
-
 # Source-specific include path for tree-sitter-yaml to find its vendored
 # <tree_sitter/parser.h> without globally polluting include paths for other grammars
 set_source_files_properties(
@@ -165,7 +163,14 @@ set_source_files_properties(
     PROPERTIES INCLUDE_DIRECTORIES "${tree-sitter-yaml_SOURCE_DIR}/src"
 )
 
-install(TARGETS codelens_core DESTINATION .)
+# --- 4b. PYTHON MODULE (conditional — skipped for standalone ASan/coverage builds) ---
+if(BUILD_PYTHON_MODULE)
+    find_package(pybind11 CONFIG REQUIRED)
+    pybind11_add_module(codelens_core src/api/bindings.cpp)
+    target_link_libraries(codelens_core PRIVATE codelens_lib)
+    target_include_directories(codelens_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/api)
+    install(TARGETS codelens_core DESTINATION .)
+endif()
 
 # --- 5. GOOGLE TEST & C++ TESTS ---
 option(BUILD_TESTING "Build C++ unit tests" ON)
@@ -187,4 +192,31 @@ if(BUILD_TESTING)
     )
     target_link_libraries(cpp_tests PRIVATE codelens_lib gtest_main)
     target_include_directories(cpp_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests/cpp)
+endif()
+
+# --- 6. SANITIZER SUPPORT (ASan) ---
+# Usage: cmake -DENABLE_SANITIZERS=ON ...
+# IMPORTANT: Only applied to codelens_lib and cpp_tests, NEVER to codelens_core (Python module).
+# Loading an ASan-instrumented .so into a non-ASan Python interpreter will crash immediately.
+option(ENABLE_SANITIZERS "Enable AddressSanitizer for native C++ tests" OFF)
+if(ENABLE_SANITIZERS AND BUILD_TESTING)
+    message(STATUS ">>> AddressSanitizer ENABLED for codelens_lib and cpp_tests")
+    target_compile_options(codelens_lib PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+    target_link_options(codelens_lib PRIVATE -fsanitize=address)
+
+    target_compile_options(cpp_tests PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+    target_link_options(cpp_tests PRIVATE -fsanitize=address)
+endif()
+
+# --- 7. CODE COVERAGE SUPPORT (gcov) ---
+# Usage: cmake -DENABLE_COVERAGE=ON ...
+# Injects --coverage flags for gcov/lcov instrumentation.
+option(ENABLE_COVERAGE "Enable gcov code coverage instrumentation" OFF)
+if(ENABLE_COVERAGE AND BUILD_TESTING)
+    message(STATUS ">>> Code Coverage ENABLED for codelens_lib and cpp_tests")
+    target_compile_options(codelens_lib PRIVATE --coverage -fprofile-arcs -ftest-coverage)
+    target_link_options(codelens_lib PRIVATE --coverage)
+
+    target_compile_options(cpp_tests PRIVATE --coverage -fprofile-arcs -ftest-coverage)
+    target_link_options(cpp_tests PRIVATE --coverage)
 endif()

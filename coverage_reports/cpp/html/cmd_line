@@ -1,0 +1,1 @@
+genhtml coverage_reports/cpp/coverage.info --output-directory coverage_reports/cpp/html --title 'DECODE C++ Coverage' --legend

@@ -24,5 +24,15 @@ dev = [
     "pytest (>=9.1.1,<10.0.0)",
     "scikit-build-core>=0.10.0",
     "hypothesis (>=6.156.4,<7.0.0)",
-    "pytest-benchmark (>=5.2.3,<6.0.0)"
+    "pytest-benchmark (>=5.2.3,<6.0.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)",
+    "gcovr (>=8.6,<9.0)"
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mutmut]
+paths_to_mutate = "src/"
+tests_dir = "tests/"
+runner = "python -m pytest -x --benchmark-disable"
