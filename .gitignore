@@ -14,4 +14,4 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
-EOF
+EOFdecode_graph.db*
