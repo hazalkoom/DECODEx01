@@ -65,6 +65,39 @@ std::string SymbolExtractor::extract_signature(TSNode node, const std::string& s
     return extract_text(node, source_code) + "()";
 }
 
+std::string SymbolExtractor::extract_return_type(TSNode name_node, const std::string& source_code) {
+    TSNode parent = ts_node_parent(name_node);
+    if (ts_node_is_null(parent)) return "auto";
+
+    // Strategy 1 (Python): The function_definition node has a `return_type` field.
+    // This maps to the `-> SomeType` annotation in typed Python.
+    // NOTE: `name_node`'s parent is `function_definition` in Python.
+    TSNode ret_node = ts_node_child_by_field_name(parent, "return_type", 11);
+    if (!ts_node_is_null(ret_node)) {
+        std::string ret = extract_text(ret_node, source_code);
+        // Tree-sitter includes the `->` token as part of the text. Strip it.
+        if (ret.size() > 2 && ret[0] == '-' && ret[1] == '>') {
+            size_t start = ret.find_first_not_of(" ", 2);
+            if (start != std::string::npos) return ret.substr(start);
+        }
+        return ret;
+    }
+
+    // Strategy 2 (C++): For `int foo()`, the AST is:
+    //   function_definition -> type: "int", declarator: function_declarator -> declarator: identifier
+    // So `name_node`'s parent is `function_declarator`, and its parent is `function_definition`.
+    // The `type` field of `function_definition` holds the return type.
+    TSNode grandparent = ts_node_parent(parent);
+    if (!ts_node_is_null(grandparent)) {
+        TSNode type_node = ts_node_child_by_field_name(grandparent, "type", 4);
+        if (!ts_node_is_null(type_node)) {
+            return extract_text(type_node, source_code);
+        }
+    }
+
+    return "auto";
+}
+
 std::vector<Symbol> SymbolExtractor::extract(TSNode root_node, TSQuery* query, const std::string& source_code) {
     std::vector<Symbol> symbols;
     if (query == nullptr) return symbols;
@@ -102,7 +135,7 @@ std::vector<Symbol> SymbolExtractor::extract(TSNode root_node, TSQuery* query, c
             sym.fully_qualified_name = path_prefix + sym.name;
             sym.signature = (sym.kind == SymbolKind::Class) ? sym.name : extract_signature(name_node, source_code);
             sym.docstring = extract_docstring(parent_node, source_code);
-            sym.return_type = "auto"; // Default fallback typing deduction for single pass parsing phase
+            sym.return_type = (sym.kind == SymbolKind::Class) ? "" : extract_return_type(name_node, source_code);
             
             sym.start_line = ts_node_start_point(parent_node).row + 1;
             sym.end_line = ts_node_end_point(parent_node).row + 1;

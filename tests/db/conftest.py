@@ -71,7 +71,9 @@ def populated_db(db_manager, db_query):
     ]
 
     refs_data = [
-        {"file_id": 1, "caller_fqn": "app.AppServer.start", "callee_fqn": "utils.helper_func", "kind": "Call", "line_number": 15}
+        {"file_id": 1, "caller_fqn": "app.AppServer.start", "callee_fqn": "utils.helper_func", "kind": "Call", "line_number": 15},
+        {"file_id": 2, "caller_fqn": "utils.helper_func", "callee_fqn": "os.path.join", "kind": "Call", "line_number": 6},
+        {"file_id": 1, "caller_fqn": "AppServer", "callee_fqn": "BaseServer", "kind": "Inheritance", "line_number": 10},
     ]
     
     db_manager.ingest_project_data(files_data, symbols_data, deps_data, refs_data)

@@ -34,7 +34,8 @@ bool ASTParser::set_language(const std::string& lang_name) {
             "(import_from_statement module_name: (_) @module_name)";
         reference_query_str = 
             "(call function: (identifier) @callee_name) "
-            "(call function: (attribute attribute: (identifier) @callee_name))";
+            "(call function: (attribute attribute: (identifier) @callee_name)) "
+            "(class_definition (argument_list (identifier) @callee_name))"; // Inheritance: class Foo(Bar)
     } 
     else if (lang_name == "JavaScript" || lang_name == "javascript") {
         current_language = tree_sitter_javascript();
@@ -55,7 +56,8 @@ bool ASTParser::set_language(const std::string& lang_name) {
         dependency_query_str = "(preproc_include path: (_) @module_name)";
         reference_query_str = 
             "(call_expression function: (identifier) @callee_name) "
-            "(call_expression function: (field_expression field: (field_identifier) @callee_name))";
+            "(call_expression function: (field_expression field: (field_identifier) @callee_name)) "
+            "(base_class_clause (type_identifier) @callee_name)"; // Inheritance: class Foo : public Bar
     }
     else if (lang_name == "Go" || lang_name == "go") {
         current_language = tree_sitter_go();

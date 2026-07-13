@@ -60,7 +60,7 @@ def test_remove_stale_files_cascade(populated_db):
     with db_manager.SessionLocal() as session:
         assert session.query(SymbolRecord).count() == 3
         assert session.query(DependencyRecord).count() == 3
-        assert session.query(ReferenceRecord).count() == 1
+        assert session.query(ReferenceRecord).count() == 3
         
     # Delete ONE file (/test/app.py which is file_id 1)
     db_manager.remove_stale_files(["/test/app.py"])
@@ -79,7 +79,8 @@ def test_remove_stale_files_cascade(populated_db):
         assert len(deps) == 1
         assert deps[0].module_name == "sys" # from File 2
 
-        assert session.query(ReferenceRecord).count() == 0
+        # 1 reference remains: the Call from utils.helper_func (file_id=2)
+        assert session.query(ReferenceRecord).count() == 1
 
 def test_empty_ingestions(db_manager):
     """Edge Case: Ensure manager doesn't crash on empty arrays."""

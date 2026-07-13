@@ -51,6 +51,19 @@ std::string ReferenceExtractor::determine_caller_fqn(TSNode node, const std::str
                 break; // We found the caller, stop climbing
             }
         }
+        
+        // NEW: Catch class-level references (e.g., inheritance superclass declarations).
+        // This fires when a reference appears directly inside a class definition body
+        // but NOT inside any method. The enclosing class IS the caller.
+        if (type == "class_definition" || type == "class_declaration" ||
+            type == "class_specifier" || type == "struct_item") {
+            TSNode class_name_node = ts_node_child_by_field_name(current, "name", 4);
+            if (!ts_node_is_null(class_name_node)) {
+                caller = extract_text(class_name_node, source_code);
+                break;
+            }
+        }
+
         current = ts_node_parent(current);
     }
     
@@ -71,17 +84,30 @@ std::vector<Reference> ReferenceExtractor::extract(TSNode root_node, TSQuery* qu
             TSNode capture_node = match.captures[i].node;
             
             Reference ref;
-            // Extract the actual function name being called[cite: 10]
+            // Extract the actual function name being called
             ref.callee_fqn = extract_text(capture_node, source_code);
             
             // CONTEXT AWARENESS: Figure out who is making the call
             ref.caller_fqn = determine_caller_fqn(capture_node, source_code);
             
-            // Tree-sitter is 0-indexed, so we add 1 for standard human-readable line numbers[cite: 10]
+            // Tree-sitter is 0-indexed, so we add 1 for standard human-readable line numbers
             ref.line_number = ts_node_start_point(capture_node).row + 1;
             
-            // Safely assign the enum kind
-            ref.kind = ReferenceKind::Call; 
+            // INHERITANCE DETECTION: Check if this reference is a class superclass declaration,
+            // not a plain function call.
+            // - C++: parent is `base_class_specifier` (inside `base_class_clause`)
+            // - Python: parent is `argument_list` whose parent is `class_definition`
+            TSNode capture_parent = ts_node_parent(capture_node);
+            std::string parent_type = ts_node_is_null(capture_parent) ? "" : std::string(ts_node_type(capture_parent));
+            TSNode grandparent = ts_node_parent(capture_parent);
+            std::string gp_type = ts_node_is_null(grandparent) ? "" : std::string(ts_node_type(grandparent));
+
+            if (parent_type == "base_class_clause" ||
+                (parent_type == "argument_list" && gp_type == "class_definition")) {
+                ref.kind = ReferenceKind::Inheritance;
+            } else {
+                ref.kind = ReferenceKind::Call;
+            }
             
             references.push_back(ref);
         }

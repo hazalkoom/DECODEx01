@@ -18,4 +18,7 @@ private:
 
     // Helper to capture the parameters/arguments line for the function signature
     static std::string extract_signature(TSNode node, const std::string& source_code);
+
+    // Helper to extract the real return type from Python `-> Type` annotations or C++ return type nodes
+    static std::string extract_return_type(TSNode name_node, const std::string& source_code);
 };
