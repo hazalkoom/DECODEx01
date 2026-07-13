@@ -29,9 +29,39 @@ def populated_db(db_manager, db_query):
     ]
     
     symbols_data = [
-        {"file_id": 1, "name": "AppServer", "type": "class", "start_line": 10, "end_line": 50},
-        {"file_id": 1, "name": "start", "type": "function", "start_line": 12, "end_line": 20},
-        {"file_id": 2, "name": "helper_func", "type": "function", "start_line": 5, "end_line": 8}
+        {
+            "file_id": 1, 
+            "name": "AppServer", 
+            "fully_qualified_name": "app.AppServer",
+            "signature": "AppServer",
+            "return_type": "AppServer",
+            "type": "class", 
+            "docstring": "Main app server class",
+            "start_line": 10, 
+            "end_line": 50
+        },
+        {
+            "file_id": 1, 
+            "name": "start", 
+            "fully_qualified_name": "app.AppServer.start",
+            "signature": "start(self, port)",
+            "return_type": "None",
+            "type": "function", 
+            "docstring": "Start the server",
+            "start_line": 12, 
+            "end_line": 20
+        },
+        {
+            "file_id": 2, 
+            "name": "helper_func", 
+            "fully_qualified_name": "utils.helper_func",
+            "signature": "helper_func()",
+            "return_type": "int",
+            "type": "function", 
+            "docstring": "A helper function",
+            "start_line": 5, 
+            "end_line": 8
+        }
     ]
     
     deps_data = [
@@ -39,7 +69,11 @@ def populated_db(db_manager, db_query):
         {"file_id": 1, "module_name": "pytest", "imported_name": "fixture", "line_number": 2},
         {"file_id": 2, "module_name": "sys", "imported_name": "exit", "line_number": 1}
     ]
+
+    refs_data = [
+        {"file_id": 1, "caller_fqn": "app.AppServer.start", "callee_fqn": "utils.helper_func", "kind": "Call", "line_number": 15}
+    ]
     
-    db_manager.ingest_project_data(files_data, symbols_data, deps_data)
+    db_manager.ingest_project_data(files_data, symbols_data, deps_data, refs_data)
     
     return db_manager, db_query

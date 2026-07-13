@@ -18,19 +18,21 @@ TEST(ASTParserTest, ParsesPythonSymbolsAndDependencies) {
         "def helper():\n"
         "    pass\n";
 
-    // Extract symbols
-    auto symbols = parser.extract_symbols(python_code);
+    // Analyze file (Single-Pass)
+    FileContext context = parser.analyze_file("dummy.py", python_code);
+
+    // Check symbols
+    auto& symbols = context.symbols;
     ASSERT_EQ(symbols.size(), 3);
     EXPECT_EQ(symbols[0].name, "DatabaseConnection");
-    EXPECT_EQ(symbols[0].type, "class");
+    EXPECT_EQ(symbols[0].kind, SymbolKind::Class);
     EXPECT_EQ(symbols[1].name, "connect");
-    EXPECT_EQ(symbols[1].type, "function");
+    EXPECT_EQ(symbols[1].kind, SymbolKind::Method);
     EXPECT_EQ(symbols[2].name, "helper");
-    EXPECT_EQ(symbols[2].type, "function");
+    EXPECT_EQ(symbols[2].kind, SymbolKind::Function);
 
-    // Extract dependencies
-    // Note: The current query only captures @module_name, not @imported_name
-    auto deps = parser.extract_dependencies(python_code);
+    // Check dependencies
+    auto& deps = context.dependencies;
     ASSERT_EQ(deps.size(), 2);
     EXPECT_EQ(deps[0].module_name, "os");
     EXPECT_EQ(deps[1].module_name, "json");

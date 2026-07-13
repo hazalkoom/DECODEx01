@@ -1,6 +1,6 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
-from python.decode_db.schema import FileRecord, SymbolRecord, DependencyRecord
+from python.decode_db.schema import FileRecord, SymbolRecord, DependencyRecord, ReferenceRecord
 from sqlalchemy import select
 
 def test_schema_setup(db_manager):
@@ -10,23 +10,37 @@ def test_schema_setup(db_manager):
         files = session.execute(select(FileRecord)).all()
         symbols = session.execute(select(SymbolRecord)).all()
         deps = session.execute(select(DependencyRecord)).all()
+        refs = session.execute(select(ReferenceRecord)).all()
         
         assert len(files) == 0
         assert len(symbols) == 0
         assert len(deps) == 0
+        assert len(refs) == 0
 
 def test_bulk_ingestion(db_manager):
     """Test that ingest_project_data properly loads mass dictionaries into SQLite."""
     files_data = [{"filepath": "/test/a.py", "language": "python", "last_modified": 1.0}]
-    symbols_data = [{"file_id": 1, "name": "ClassA", "type": "class", "start_line": 1, "end_line": 10}]
+    symbols_data = [{
+        "file_id": 1, 
+        "name": "ClassA", 
+        "fully_qualified_name": "ClassA",
+        "signature": "ClassA",
+        "return_type": "ClassA",
+        "type": "class", 
+        "docstring": "Class A docstring",
+        "start_line": 1, 
+        "end_line": 10
+    }]
     deps_data = [{"file_id": 1, "module_name": "os", "imported_name": None, "line_number": 2}]
+    refs_data = [{"file_id": 1, "caller_fqn": "ClassA.foo", "callee_fqn": "bar", "kind": "Call", "line_number": 5}]
     
-    db_manager.ingest_project_data(files_data, symbols_data, deps_data)
+    db_manager.ingest_project_data(files_data, symbols_data, deps_data, refs_data)
     
     with db_manager.SessionLocal() as session:
         assert session.query(FileRecord).count() == 1
         assert session.query(SymbolRecord).count() == 1
         assert session.query(DependencyRecord).count() == 1
+        assert session.query(ReferenceRecord).count() == 1
 
 def test_get_existing_files(populated_db):
     """Test retrieving existing files logic."""
@@ -46,6 +60,7 @@ def test_remove_stale_files_cascade(populated_db):
     with db_manager.SessionLocal() as session:
         assert session.query(SymbolRecord).count() == 3
         assert session.query(DependencyRecord).count() == 3
+        assert session.query(ReferenceRecord).count() == 1
         
     # Delete ONE file (/test/app.py which is file_id 1)
     db_manager.remove_stale_files(["/test/app.py"])
@@ -55,7 +70,7 @@ def test_remove_stale_files_cascade(populated_db):
         assert session.query(FileRecord).count() == 1
         assert session.query(FileRecord).first().filepath == "/test/utils.py"
         
-        # All symbols and deps for File 1 must be cascade deleted!
+        # All symbols, deps, and refs for File 1 must be cascade deleted!
         symbols = session.query(SymbolRecord).all()
         assert len(symbols) == 1
         assert symbols[0].name == "helper_func" # from File 2
@@ -63,6 +78,8 @@ def test_remove_stale_files_cascade(populated_db):
         deps = session.query(DependencyRecord).all()
         assert len(deps) == 1
         assert deps[0].module_name == "sys" # from File 2
+
+        assert session.query(ReferenceRecord).count() == 0
 
 def test_empty_ingestions(db_manager):
     """Edge Case: Ensure manager doesn't crash on empty arrays."""

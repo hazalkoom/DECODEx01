@@ -1,6 +1,7 @@
 #include "ast_parser.hpp"
 #include "symbol_extractor.hpp"
 #include "dependency_extractor.hpp"
+#include "reference_extractor.hpp"
 
 extern "C" {
     TSLanguage* tree_sitter_python();
@@ -27,11 +28,13 @@ bool ASTParser::set_language(const std::string& lang_name) {
     if (lang_name == "Python" || lang_name == "python") {
         current_language = tree_sitter_python();
         symbol_query_str = "(class_definition name: (identifier) @class_name) (function_definition name: (identifier) @func_name)";
-        
         dependency_query_str = 
             "(import_statement name: (dotted_name) @module_name) "
             "(import_statement name: (aliased_import name: (dotted_name) @module_name)) "
             "(import_from_statement module_name: (_) @module_name)";
+        reference_query_str = 
+            "(call function: (identifier) @callee_name) "
+            "(call function: (attribute attribute: (identifier) @callee_name))";
     } 
     else if (lang_name == "JavaScript" || lang_name == "javascript") {
         current_language = tree_sitter_javascript();
@@ -39,6 +42,9 @@ bool ASTParser::set_language(const std::string& lang_name) {
         dependency_query_str = 
             "(import_statement source: (string) @module_name) "
             "(export_statement source: (string) @module_name)";
+        reference_query_str = 
+            "(call_expression function: (identifier) @callee_name) "
+            "(call_expression function: (member_expression property: (property_identifier) @callee_name))";
     }
     else if (lang_name == "C++" || lang_name == "cpp") {
         current_language = tree_sitter_cpp();
@@ -46,34 +52,41 @@ bool ASTParser::set_language(const std::string& lang_name) {
             "(class_specifier name: (type_identifier) @class_name) "
             "(function_definition declarator: (function_declarator declarator: (identifier) @func_name)) "
             "(function_definition declarator: (function_declarator declarator: (field_identifier) @func_name))";
-            
         dependency_query_str = "(preproc_include path: (_) @module_name)";
+        reference_query_str = 
+            "(call_expression function: (identifier) @callee_name) "
+            "(call_expression function: (field_expression field: (field_identifier) @callee_name))";
     }
     else if (lang_name == "Go" || lang_name == "go") {
         current_language = tree_sitter_go();
         symbol_query_str = "(type_spec name: (type_identifier) @class_name) (function_declaration name: (identifier) @func_name) (method_declaration name: (field_identifier) @func_name)";
         dependency_query_str = "(import_spec path: (interpreted_string_literal) @module_name)";
+        reference_query_str = 
+            "(call_expression function: (identifier) @callee_name) "
+            "(call_expression function: (selector_expression field: (field_identifier) @callee_name))";
     }
     else if (lang_name == "Rust" || lang_name == "rust") {
         current_language = tree_sitter_rust();
         symbol_query_str = "(struct_item name: (type_identifier) @class_name) (function_item name: (identifier) @func_name)";
         dependency_query_str = "(use_declaration argument: (_) @module_name)";
+        reference_query_str = 
+            "(call_expression function: (identifier) @callee_name) "
+            "(call_expression function: (field_expression field: (field_identifier) @callee_name))";
     }
     else if (lang_name == "Shell" || lang_name == "bash") {
         current_language = tree_sitter_bash();
         symbol_query_str = "(function_definition name: (word) @func_name)";
         dependency_query_str = "";
+        reference_query_str = ""; // Bash function calls are harder to reliably extract with basic queries
     }
     else if (lang_name == "JSON" || lang_name == "json") {
         current_language = tree_sitter_json();
-        symbol_query_str = ""; dependency_query_str = "";
+        symbol_query_str = ""; dependency_query_str = ""; reference_query_str = "";
     }
     else if (lang_name == "YAML" || lang_name == "yaml") {
         current_language = tree_sitter_yaml();
-        symbol_query_str = ""; dependency_query_str = "";
+        symbol_query_str = ""; dependency_query_str = ""; reference_query_str = "";
     }
-
-
     else {
         return false; 
     }
@@ -87,34 +100,40 @@ TSQuery* ASTParser::compile_query(const std::string& query_source) {
     return ts_query_new(current_language, query_source.c_str(), query_source.length(), &error_offset, &error_type);
 }
 
-std::vector<Symbol> ASTParser::extract_symbols(const std::string& source_code) {
-    std::vector<Symbol> symbols;
-    if (current_language == nullptr || symbol_query_str.empty()) return symbols; 
-    
+FileContext ASTParser::analyze_file(const std::string& filepath, const std::string& source_code) {
+    FileContext context;
+    context.filepath = filepath;
+
+    if (current_language == nullptr) return context; 
+
+    // 1. PARSE ONCE: Convert the raw string into an AST
     TSTree* tree = ts_parser_parse_string(parser, nullptr, source_code.c_str(), source_code.length());
-    if (tree == nullptr) return symbols;
+    if (tree == nullptr) return context;
 
-    TSQuery* query = compile_query(symbol_query_str);
-    if (query != nullptr) {
-        symbols = SymbolExtractor::extract(ts_tree_root_node(tree), query, source_code);
-        ts_query_delete(query);
+    TSNode root_node = ts_tree_root_node(tree);
+
+    // 2. EXTRACT SYMBOLS
+    TSQuery* symbol_query = compile_query(symbol_query_str);
+    if (symbol_query != nullptr) {
+        context.symbols = SymbolExtractor::extract(root_node, symbol_query, source_code);
+        ts_query_delete(symbol_query);
     }
-    ts_tree_delete(tree);
-    return symbols;
-}
 
-std::vector<Dependency> ASTParser::extract_dependencies(const std::string& source_code) {
-    std::vector<Dependency> deps;
-    if (current_language == nullptr || dependency_query_str.empty()) return deps; 
+    // 3. EXTRACT DEPENDENCIES
+    TSQuery* dep_query = compile_query(dependency_query_str);
+    if (dep_query != nullptr) {
+        context.dependencies = DependencyExtractor::extract(root_node, dep_query, source_code);
+        ts_query_delete(dep_query);
+    }
+
+    // 4. EXTRACT REFERENCES
+    TSQuery* ref_query = compile_query(reference_query_str);
+    if (ref_query != nullptr) {
+        context.references = ReferenceExtractor::extract(root_node, ref_query, source_code);
+        ts_query_delete(ref_query);
+    }
+
+    ts_tree_delete(tree);
     
-    TSTree* tree = ts_parser_parse_string(parser, nullptr, source_code.c_str(), source_code.length());
-    if (tree == nullptr) return deps;
-
-    TSQuery* query = compile_query(dependency_query_str);
-    if (query != nullptr) {
-        deps = DependencyExtractor::extract(ts_tree_root_node(tree), query, source_code);
-        ts_query_delete(query);
-    }
-    ts_tree_delete(tree);
-    return deps;
+    return context;
 }

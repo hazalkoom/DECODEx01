@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, insert, select, delete
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from .schema import Base, FileRecord, SymbolRecord, DependencyRecord
+from .schema import Base, FileRecord, SymbolRecord, DependencyRecord, ReferenceRecord
 
 # SQLite Performance Tuning: Enable Write-Ahead Logging (WAL) and synchronous optimization
 @event.listens_for(Engine, "connect")
@@ -47,7 +47,7 @@ class DBManager:
                 session.rollback()
                 raise e
 
-    def ingest_project_data(self, files_data: list, symbols_data: list, deps_data: list):
+    def ingest_project_data(self, files_data: list, symbols_data: list, deps_data: list, refs_data: list = None):
         """
         High-performance bulk ingestion of project AST data.
         Takes raw dictionaries to bypass ORM instantiation overhead for mass inserts.
@@ -68,6 +68,11 @@ class DBManager:
                 if deps_data:
                     for i in range(0, len(deps_data), 10000):
                         session.execute(insert(DependencyRecord), deps_data[i:i+10000])
+                
+                # 4. Insert References
+                if refs_data:
+                    for i in range(0, len(refs_data), 10000):
+                        session.execute(insert(ReferenceRecord), refs_data[i:i+10000])
                         
                 session.commit()
             except Exception as e:

@@ -116,6 +116,7 @@ add_library(codelens_lib STATIC
     src/parser/ast_parser.cpp 
     src/parser/symbol_extractor.cpp
     src/parser/dependency_extractor.cpp
+    src/parser/reference_extractor.cpp
     
     # Core
     ${tree-sitter_SOURCE_DIR}/lib/src/lib.c
