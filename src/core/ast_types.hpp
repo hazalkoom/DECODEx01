@@ -17,3 +17,11 @@ struct Dependency {
     std::string imported_name; // The specific function imported (e.g., "loads"). Can be empty!
     uint32_t line_number;      // The line where the import happened
 };
+
+struct Reference {
+    std::string callee_name; // The function or class being called (e.g., "walk_repository")
+    uint32_t line_number;    // Where the call happens
+    
+    // Note: To make this a true Call Graph, we will eventually want to calculate the 'caller_name'
+    // (the function making the call) by walking *up* the AST tree from this node.
+};

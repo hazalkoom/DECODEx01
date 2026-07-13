@@ -19,3 +19,4 @@ coverage_reports/
 mutants/
 .decode/
 decode_graph.db*
+architecture_map.html

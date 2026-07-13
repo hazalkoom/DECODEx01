@@ -6,10 +6,14 @@ authors = [
     { name = "hazalkoom" }
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11,<3.14.1 || >3.14.1"
 dependencies = [
     "pybind11>=2.11.0",
-    "sqlalchemy (>=2.0.51,<3.0.0)"
+    "sqlalchemy (>=2.0.51,<3.0.0)",
+    "networkx (>=3.6.1,<4.0.0)",
+    "matplotlib (>=3.11.0,<4.0.0)",
+    "pyqt6 (>=6.11.0,<7.0.0)",
+    "pyvis (>=0.3.2,<0.4.0)"
 ]
 
 [build-system]
