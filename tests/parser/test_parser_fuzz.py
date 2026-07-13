@@ -40,5 +40,7 @@ def test_set_language_garbage(garbage_lang):
     Ensure the parser rejects unsupported/garbage language names gracefully.
     """
     parser = codelens_core.ASTParser()
-    # It must return False and not crash/leak.
-    assert parser.set_language(garbage_lang) is False
+    if garbage_lang.lower() in SUPPORTED_LANGUAGES:
+        assert parser.set_language(garbage_lang) is True
+    else:
+        assert parser.set_language(garbage_lang) is False

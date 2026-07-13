@@ -1,6 +1,10 @@
 import argparse
 import sys
 import subprocess
+import os
+
+# Ensure src/ is in the pythonpath so module imports work like they do in pytest
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
 def main():
     # Setup the main CLI parser
@@ -22,6 +26,11 @@ def main():
     graph_parser = subparsers.add_parser("graph", help="Generate a visual dependency graph using Raw SQL")
     graph_parser.add_argument("target", help="The file or module to map dependencies for")
 
+    # Command 4: decode snapshot
+    snap_parser = subparsers.add_parser("snapshot", help="Generate AI-friendly .decode/ context folder from the indexed DB")
+    snap_parser.add_argument("--output", default=".decode", help="Output directory (default: .decode)")
+    snap_parser.add_argument("--db", default="decode_graph.db", help="Path to the SQLite database")
+
     # Parse the arguments typed in the terminal
     args = parser.parse_args()
 
@@ -33,13 +42,16 @@ def main():
         
     elif args.command == "query":
         print(f"🔍 Querying database for: '{args.symbol}'")
-        from src.python.decode_db.query_api import DBQueryAPI
+        from python.decode_db.query_api import DBQueryAPI
         api = DBQueryAPI("decode_graph.db")
         results = api.find_symbol(args.symbol)
         if not results:
             print("   ❌ Symbol not found.")
         for r in results:
             print(f"   ✅ Found {r['type']} in {r['file']} on line {r['line']}")
+    elif args.command == "snapshot":
+        from python.decode_snapshot.snapshot_generator import generate_snapshot
+        generate_snapshot(args.db, ".", args.output)
             
     elif args.command == "graph":
         print(f"🕸️  Tracing deep dependency tree for: {args.target}")
