@@ -4,7 +4,7 @@
 
 ## Flow from `main`
 
-The `main` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_main.cpp`. From there, it coordinates with 82 different components. The primary interactions involve `lstrip`, `exists`, and `connect`.
+The `main` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_main.cpp`. From there, it coordinates with 82 different components. The primary interactions involve `connect`, `FileSystemLoader`, and `execute`.
 
 ```mermaid
 sequenceDiagram
@@ -112,7 +112,7 @@ sequenceDiagram
 
 ## Flow from `DBQueryAPI.get_domain_entities`
 
-The `get_domain_entities` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 11 different components. The primary interactions involve `join`, `query`, and `SessionLocal`.
+The `get_domain_entities` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 11 different components. The primary interactions involve `filter`, `query`, and `count`.
 
 ```mermaid
 sequenceDiagram
@@ -182,7 +182,7 @@ sequenceDiagram
 
 ## Flow from `J.onClick`
 
-The `onClick` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `blur`, `focus`, and `clearActiveItems`.
+The `onClick` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `clearActiveItems`, `blur`, and `focus`.
 
 ```mermaid
 sequenceDiagram
@@ -208,7 +208,7 @@ sequenceDiagram
 
 ## Flow from `J.setup`
 
-The `setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 58 different components. The primary interactions involve `create`, `updateOriginalInput`, and `P`.
+The `setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 58 different components. The primary interactions involve `close`, `M`, and `h`.
 
 ```mermaid
 sequenceDiagram
@@ -298,7 +298,7 @@ sequenceDiagram
 
 ## Flow from `J.setupOptions`
 
-The `setupOptions` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `addOptions`, `y`, and `registerOptionGroup`.
+The `setupOptions` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `registerOptionGroup`, `addOptions`, and `y`.
 
 ```mermaid
 sequenceDiagram
@@ -320,7 +320,7 @@ sequenceDiagram
 
 ## Flow from `J.setupTemplates`
 
-The `setupTemplates` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 77 different components. The primary interactions involve `set`, `Kp`, and `call`.
+The `setupTemplates` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 77 different components. The primary interactions involve `setImages`, `py`, and `Kv`.
 
 ```mermaid
 sequenceDiagram
@@ -355,55 +355,55 @@ sequenceDiagram
 
 
 
-    t->>set: calls
+    i->>off: calls
 
 
 
-    t->>vg: calls
+    i->>apply: calls
 
 
 
-    t->>handler: calls
+    i->>d: calls
 
 
 
-    t->>init: calls
+    i->>call: calls
 
 
 
-    t->>Rv: calls
+    i->>resolve: calls
 
 
 
-    t->>qv: calls
+    i->>then: calls
 
 
 
-    t->>py: calls
+    i->>i: calls
 
 
 
-    t->>pg: calls
+    i->>i: calls
 
 
 
-    t->>add: calls
+    i->>resolve: calls
 
 
 
-    t->>recognizeWith: calls
+    i->>then: calls
 
 
 
-    t->>requireFailure: calls
+    i->>s: calls
 
 
 
-    t->>Yd: calls
+    i->>i: calls
 
 
 
-    t->>_create: calls
+    i->>a: calls
 
 
 ```
@@ -424,7 +424,7 @@ sequenceDiagram
 
 ## Flow from `test_schema_setup`
 
-The `test_schema_setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_manager.py`. From there, it coordinates with 5 different components. The primary interactions involve `SessionLocal`, `execute`, and `len`.
+The `test_schema_setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_manager.py`. From there, it coordinates with 5 different components. The primary interactions involve `execute`, `select`, and `SessionLocal`.
 
 ```mermaid
 sequenceDiagram
@@ -546,95 +546,201 @@ sequenceDiagram
 
 ```
 
-## Flow from `BaseGenerator._generate_ai_summary`
+## Flow from `DBManager.remove_stale_files`
 
-The `_generate_ai_summary` workflow represents a critical path in the system. When this flow is triggered, execution begins in `base_generator.py`. From there, it coordinates with 6 different components. The primary interactions involve `create`, `strip`, and `dumps`.
+The `remove_stale_files` workflow represents a critical path in the system. When this flow is triggered, execution begins in `manager.py`. From there, it coordinates with 9 different components. The primary interactions involve `range`, `in_`, and `rollback`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as BaseGenerator__generate_ai_summary
+    participant Start as DBManager_remove_stale_files
 
 
-    BaseGenerator__generate_ai_summary->>getenv: calls
-
-
-
-    BaseGenerator__generate_ai_summary->>print: calls
+    DBManager_remove_stale_files->>SessionLocal: calls
 
 
 
-    BaseGenerator__generate_ai_summary->>getenv: calls
+    DBManager_remove_stale_files->>range: calls
 
 
 
-    BaseGenerator__generate_ai_summary->>OpenAI: calls
+    DBManager_remove_stale_files->>len: calls
 
 
 
-    BaseGenerator__generate_ai_summary->>print: calls
+    DBManager_remove_stale_files->>execute: calls
 
 
 
-    BaseGenerator__generate_ai_summary->>create: calls
+    DBManager_remove_stale_files->>delete: calls
 
 
 
-    BaseGenerator__generate_ai_summary->>dumps: calls
+    DBManager_remove_stale_files->>where: calls
 
 
 
-    BaseGenerator__generate_ai_summary->>strip: calls
+    DBManager_remove_stale_files->>in_: calls
 
 
 
-    BaseGenerator__generate_ai_summary->>print: calls
+    DBManager_remove_stale_files->>commit: calls
+
+
+
+    DBManager_remove_stale_files->>rollback: calls
 
 
 ```
 
-## Flow from `DocsCoordinator.generate_all`
+## Flow from `DBQueryAPI.find_callers_of`
 
-The `generate_all` workflow represents a critical path in the system. When this flow is triggered, execution begins in `coordinator.py`. From there, it coordinates with 3 different components. The primary interactions involve `generate`, `makedirs`, and `_render_index`.
+The `find_callers_of` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 6 different components. The primary interactions involve `select`, `execute`, and `SessionLocal`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as DocsCoordinator_generate_all
+    participant Start as DBQueryAPI_find_callers_of
 
 
-    DocsCoordinator_generate_all->>makedirs: calls
-
-
-
-    DocsCoordinator_generate_all->>generate: calls
+    DBQueryAPI_find_callers_of->>SessionLocal: calls
 
 
 
-    DocsCoordinator_generate_all->>_render_index: calls
+    DBQueryAPI_find_callers_of->>select: calls
+
+
+
+    DBQueryAPI_find_callers_of->>join: calls
+
+
+
+    DBQueryAPI_find_callers_of->>where: calls
+
+
+
+    DBQueryAPI_find_callers_of->>where: calls
+
+
+
+    DBQueryAPI_find_callers_of->>execute: calls
+
+
+
+    DBQueryAPI_find_callers_of->>all: calls
 
 
 ```
 
-## Flow from `Ey`
+## Flow from `DBQueryAPI.get_class_hierarchy`
 
-The `Ey` workflow represents a critical path in the system. When this flow is triggered, execution begins in `vis-network.min.js`. From there, it coordinates with 2 different components. The primary interactions involve `create` and `qv`.
+The `get_class_hierarchy` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 6 different components. The primary interactions involve `select`, `execute`, and `SessionLocal`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as Ey
+    participant Start as DBQueryAPI_get_class_hierarchy
 
 
-    Ey->>create: calls
+    DBQueryAPI_get_class_hierarchy->>SessionLocal: calls
 
 
 
-    Ey->>qv: calls
+    DBQueryAPI_get_class_hierarchy->>select: calls
+
+
+
+    DBQueryAPI_get_class_hierarchy->>join: calls
+
+
+
+    DBQueryAPI_get_class_hierarchy->>where: calls
+
+
+
+    DBQueryAPI_get_class_hierarchy->>execute: calls
+
+
+
+    DBQueryAPI_get_class_hierarchy->>all: calls
+
+
+```
+
+## Flow from `DBQueryAPI.get_module_structure`
+
+The `get_module_structure` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 13 different components. The primary interactions involve `split`, `set`, and `query`.
+
+```mermaid
+sequenceDiagram
+    participant Start as DBQueryAPI_get_module_structure
+
+
+    DBQueryAPI_get_module_structure->>SessionLocal: calls
+
+
+
+    DBQueryAPI_get_module_structure->>query: calls
+
+
+
+    DBQueryAPI_get_module_structure->>all: calls
+
+
+
+    DBQueryAPI_get_module_structure->>defaultdict: calls
+
+
+
+    DBQueryAPI_get_module_structure->>set: calls
+
+
+
+    DBQueryAPI_get_module_structure->>lstrip: calls
+
+
+
+    DBQueryAPI_get_module_structure->>split: calls
+
+
+
+    DBQueryAPI_get_module_structure->>len: calls
+
+
+
+    DBQueryAPI_get_module_structure->>join: calls
+
+
+
+    DBQueryAPI_get_module_structure->>append: calls
+
+
+
+    DBQueryAPI_get_module_structure->>len: calls
+
+
+
+    DBQueryAPI_get_module_structure->>len: calls
+
+
+
+    DBQueryAPI_get_module_structure->>add: calls
+
+
+
+    DBQueryAPI_get_module_structure->>items: calls
+
+
+
+    DBQueryAPI_get_module_structure->>append: calls
+
+
+
+    DBQueryAPI_get_module_structure->>list: calls
 
 
 ```
 
 ## Flow from `J.addOption`
 
-The `addOption` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 5 different components. The primary interactions involve `q`, `trigger`, and `addOptions`.
+The `addOption` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 5 different components. The primary interactions involve `hasOwnProperty`, `isArray`, and `addOptions`.
 
 ```mermaid
 sequenceDiagram
@@ -662,220 +768,328 @@ sequenceDiagram
 
 ```
 
-## Flow from `J.advanceSelection`
+## Flow from `J.enable`
 
-The `advanceSelection` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 8 different components. The primary interactions involve `getLastActive`, `K`, and `setActiveItemClass`.
+The `enable` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 1 different components. The primary interactions involve `unlock`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as J_advanceSelection
+    participant Start as J_enable
 
 
-    J_advanceSelection->>inputValue: calls
-
-
-
-    J_advanceSelection->>K: calls
-
-
-
-    J_advanceSelection->>K: calls
-
-
-
-    J_advanceSelection->>getLastActive: calls
-
-
-
-    J_advanceSelection->>contains: calls
-
-
-
-    J_advanceSelection->>getAdjacent: calls
-
-
-
-    J_advanceSelection->>contains: calls
-
-
-
-    J_advanceSelection->>removeActiveItem: calls
-
-
-
-    J_advanceSelection->>setActiveItemClass: calls
-
-
-
-    J_advanceSelection->>moveCaret: calls
+    J_enable->>unlock: calls
 
 
 ```
 
-## Flow from `J.clearOptions`
+## Flow from `J.hook`
 
-The `clearOptions` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 4 different components. The primary interactions involve `trigger`, `y`, and `clearCache`.
+The `hook` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 1 different components. The primary interactions involve `apply`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as J_clearOptions
+    participant Start as J_hook
 
 
-    J_clearOptions->>clearCache: calls
-
-
-
-    J_clearOptions->>y: calls
+    J_hook->>apply: calls
 
 
 
-    J_clearOptions->>indexOf: calls
+    J_hook->>apply: calls
 
 
 
-    J_clearOptions->>trigger: calls
+    J_hook->>apply: calls
 
 
 ```
 
-## Flow from `J.getScoreFunction`
+## Flow from `J.insertAtCaret`
 
-The `getScoreFunction` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 2 different components. The primary interactions involve `getSearchOptions` and `getScoreFunction`.
+The `insertAtCaret` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 2 different components. The primary interactions involve `setCaret` and `insertBefore`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as J_getScoreFunction
+    participant Start as J_insertAtCaret
 
 
-    J_getScoreFunction->>getScoreFunction: calls
+    J_insertAtCaret->>insertBefore: calls
 
 
 
-    J_getScoreFunction->>getSearchOptions: calls
+    J_insertAtCaret->>setCaret: calls
 
 
 ```
 
-## Flow from `TestPythonInheritance.test_single_inheritance_detected`
+## Flow from `J.onBlur`
 
-The `test_single_inheritance_detected` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_inheritance.py`. From there, it coordinates with 3 different components. The primary interactions involve `dedent`, `_parse`, and `len`.
+The `onBlur` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 35 different components. The primary interactions involve `setImages`, `setOptions`, and `createItem`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as TestPythonInheritance_test_single_inheritance_detected
+    participant Start as J_onBlur
 
 
-    TestPythonInheritance_test_single_inheritance_detected->>dedent: calls
-
-
-
-    TestPythonInheritance_test_single_inheritance_detected->>_parse: calls
+    J_onBlur->>hasFocus: calls
 
 
 
-    TestPythonInheritance_test_single_inheritance_detected->>len: calls
+    J_onBlur->>close: calls
+
+
+
+    J_onBlur->>setActiveItem: calls
+
+
+
+    J_onBlur->>setCaret: calls
+
+
+
+    J_onBlur->>trigger: calls
+
+
+
+    J_onBlur->>createItem: calls
+
+
+
+    J_onBlur->>i: calls
+
+
+
+    i->>off: calls
+
+
+
+    i->>apply: calls
+
+
+
+    i->>d: calls
+
+
+
+    i->>call: calls
+
+
+
+    i->>resolve: calls
+
+
+
+    i->>then: calls
+
+
+
+    i->>i: calls
+
+
+
+    i->>i: calls
+
+
+
+    i->>resolve: calls
+
+
+
+    i->>then: calls
+
+
+
+    i->>s: calls
+
+
+
+    i->>i: calls
+
+
+
+    i->>a: calls
 
 
 ```
 
-## Flow from `language_repo`
+## Flow from `J.render`
 
-The `language_repo` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_language_detector.py`. From there, it coordinates with 2 different components. The primary interactions involve `write_text` and `str`.
+The `render` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 1 different components. The primary interactions involve `_render`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as language_repo
+    participant Start as J_render
 
 
-    language_repo->>write_text: calls
-
-
-
-    language_repo->>write_text: calls
-
-
-
-    language_repo->>write_text: calls
-
-
-
-    language_repo->>write_text: calls
-
-
-
-    language_repo->>write_text: calls
-
-
-
-    language_repo->>write_text: calls
-
-
-
-    language_repo->>str: calls
-
-
-
-    language_repo->>str: calls
-
-
-
-    language_repo->>str: calls
-
-
-
-    language_repo->>str: calls
-
-
-
-    language_repo->>str: calls
-
-
-
-    language_repo->>str: calls
+    J_render->>_render: calls
 
 
 ```
 
-## Flow from `test_find_symbol_missing`
+## Flow from `TestCppInheritance.test_inheritance_caller_is_child_class`
 
-The `test_find_symbol_missing` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_query_api.py`. From there, it coordinates with 3 different components. The primary interactions involve `find_symbol`, `isinstance`, and `len`.
+The `test_inheritance_caller_is_child_class` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_inheritance.py`. From there, it coordinates with 3 different components. The primary interactions involve `_parse`, `any`, and `dedent`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as test_find_symbol_missing
+    participant Start as TestCppInheritance_test_inheritance_caller_is_child_class
 
 
-    test_find_symbol_missing->>find_symbol: calls
-
-
-
-    test_find_symbol_missing->>isinstance: calls
+    TestCppInheritance_test_inheritance_caller_is_child_class->>dedent: calls
 
 
 
-    test_find_symbol_missing->>len: calls
+    TestCppInheritance_test_inheritance_caller_is_child_class->>_parse: calls
+
+
+
+    TestCppInheritance_test_inheritance_caller_is_child_class->>any: calls
 
 
 ```
 
-## Flow from `test_get_existing_files`
+## Flow from `selectNode`
 
-The `test_get_existing_files` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_manager.py`. From there, it coordinates with 3 different components. The primary interactions involve `len`, `isinstance`, and `get_existing_files`.
+The `selectNode` workflow represents a critical path in the system. When this flow is triggered, execution begins in `utils.js`. From there, it coordinates with 9 different components. The primary interactions involve `concat`, `selectNodes`, and `neighbourhoodHighlight`.
 
 ```mermaid
 sequenceDiagram
-    participant Start as test_get_existing_files
+    participant Start as selectNode
 
 
-    test_get_existing_files->>get_existing_files: calls
-
-
-
-    test_get_existing_files->>isinstance: calls
+    selectNode->>selectNodes: calls
 
 
 
-    test_get_existing_files->>len: calls
+    selectNode->>neighbourhoodHighlight: calls
+
+
+
+    neighbourhoodHighlight->>get: calls
+
+
+
+    neighbourhoodHighlight->>getConnectedNodes: calls
+
+
+
+    neighbourhoodHighlight->>concat: calls
+
+
+
+    neighbourhoodHighlight->>getConnectedNodes: calls
+
+
+
+    neighbourhoodHighlight->>hasOwnProperty: calls
+
+
+
+    neighbourhoodHighlight->>push: calls
+
+
+
+    neighbourhoodHighlight->>update: calls
+
+
+
+    neighbourhoodHighlight->>hasOwnProperty: calls
+
+
+
+    neighbourhoodHighlight->>push: calls
+
+
+
+    neighbourhoodHighlight->>update: calls
+
+
+
+    selectNodes->>selectNodes: calls
+
+
+
+    selectNodes->>filterHighlight: calls
+
+
+
+    filterHighlight->>get: calls
+
+
+
+    filterHighlight->>hasOwnProperty: calls
+
+
+
+    filterHighlight->>push: calls
+
+
+
+    filterHighlight->>update: calls
+
+
+
+    filterHighlight->>hasOwnProperty: calls
+
+
+
+    filterHighlight->>push: calls
+
+
+```
+
+## Flow from `test_go_basic_symbols`
+
+The `test_go_basic_symbols` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_go.py`. From there, it coordinates with 5 different components. The primary interactions involve `set_language`, `ASTParser`, and `dedent`.
+
+```mermaid
+sequenceDiagram
+    participant Start as test_go_basic_symbols
+
+
+    test_go_basic_symbols->>ASTParser: calls
+
+
+
+    test_go_basic_symbols->>set_language: calls
+
+
+
+    test_go_basic_symbols->>dedent: calls
+
+
+
+    test_go_basic_symbols->>extract_symbols: calls
+
+
+
+    test_go_basic_symbols->>len: calls
+
+
+```
+
+## Flow from `test_go_garbage_safety`
+
+The `test_go_garbage_safety` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_go.py`. From there, it coordinates with 4 different components. The primary interactions involve `extract_dependencies`, `set_language`, and `ASTParser`.
+
+```mermaid
+sequenceDiagram
+    participant Start as test_go_garbage_safety
+
+
+    test_go_garbage_safety->>ASTParser: calls
+
+
+
+    test_go_garbage_safety->>set_language: calls
+
+
+
+    test_go_garbage_safety->>extract_dependencies: calls
+
+
+
+    test_go_garbage_safety->>isinstance: calls
 
 
 ```
@@ -916,7 +1130,7 @@ sequenceDiagram
 
 ## Flow from `test_python_garbage_safety`
 
-The `test_python_garbage_safety` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_ast_parser.py`. From there, it coordinates with 6 different components. The primary interactions involve `isinstance`, `dedent`, and `ASTParser`.
+The `test_python_garbage_safety` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_ast_parser.py`. From there, it coordinates with 6 different components. The primary interactions involve `extract_dependencies`, `set_language`, and `ASTParser`.
 
 ```mermaid
 sequenceDiagram
@@ -948,24 +1162,6 @@ sequenceDiagram
 
 
     test_python_garbage_safety->>isinstance: calls
-
-
-```
-
-## Flow from `test_walker_nonexistent_directory`
-
-The `test_walker_nonexistent_directory` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_fs_walker.py`. From there, it coordinates with 2 different components. The primary interactions involve `walk_repository` and `len`.
-
-```mermaid
-sequenceDiagram
-    participant Start as test_walker_nonexistent_directory
-
-
-    test_walker_nonexistent_directory->>walk_repository: calls
-
-
-
-    test_walker_nonexistent_directory->>len: calls
 
 
 ```

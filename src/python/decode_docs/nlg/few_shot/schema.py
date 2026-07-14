@@ -44,7 +44,7 @@ def load_schema(project_root: str) -> dict:
     return DEFAULT_SCHEMA
 
 def populate_sections(schema: dict, api: DBQueryAPI) -> list:
-    """Match AST symbols against schema triggers and populate sections."""
+    """Match AST symbols against schema triggers using strict scoring (Classes only, file paths)."""
     import re
     all_symbols = api.get_all_symbols()
     populated = []
@@ -56,13 +56,36 @@ def populate_sections(schema: dict, api: DBQueryAPI) -> list:
             continue
 
         regex = re.compile(pattern, re.IGNORECASE)
-        matched = []
+        scored_matches = []
+        
         for sym in all_symbols:
+            # Stricter heuristic 1: Only match Classes (or Types), not functions/variables
+            # Exception: if it's explicitly a middleware, it might be a function
+            is_class = sym.get("type", "").lower() in ["class", "struct", "interface", "type"]
+            is_middleware = "middleware" in pattern.lower() and sym.get("type", "").lower() == "function"
+            
+            if not (is_class or is_middleware):
+                continue
+                
+            score = 0
+            # Score from name
             if regex.search(sym.get("name", "")):
-                matched.append(sym)
+                score += 2
+                
+            # Score from file path context
+            filepath = sym.get("file", "").lower()
+            if regex.search(filepath):
+                score += 1
+                
+            if score >= 2: # Require a strong match
+                scored_matches.append((score, sym))
 
-        if matched:
-            # Use the first match for the template, collect all names
+        if scored_matches:
+            # Sort by score descending
+            scored_matches.sort(key=lambda x: x[0], reverse=True)
+            matched = [m[1] for m in scored_matches]
+            
+            # Use the best match for the template, collect all names
             first = matched[0]
             all_names = list(set(m["name"] for m in matched))
 

@@ -3,10 +3,10 @@
 
 ## Endpoints
 
-| Method | Handler | File | Description |
-|--------|---------|------|-------------|
+| Method | Path | Handler | File | Description |
+|--------|------|---------|------|-------------|
 {% for route in routes %}
-| `{{ route.method }}` | `{{ route.handler_name }}` | `{{ route.file }}` | {{ route.description or "—" }} |
+| `{{ route.method }}` | `{{ route.path }}` | `{{ route.handler_name }}` | `{{ route.file }}` | {{ route.description or "—" }} |
 {% endfor %}
 
 {% for section in sections %}

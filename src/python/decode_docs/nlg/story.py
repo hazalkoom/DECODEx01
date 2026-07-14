@@ -15,10 +15,12 @@ def find_deepest_call_chain(api: DBQueryAPI) -> list:
 
     return best_chain
 
-def _dfs_longest(api, current_fqn, visited, path):
-    """DFS to find the longest chain from current_fqn."""
+def _dfs_longest(api, current_fqn, visited, path, penalty=0):
+    """DFS to find the longest *meaningful* chain from current_fqn.
+    Penalizes paths that go deep into utility/logging functions."""
     if current_fqn in visited or len(path) > 15:
         return path
+        
     visited.add(current_fqn)
     path = path + [current_fqn]
 
@@ -30,8 +32,20 @@ def _dfs_longest(api, current_fqn, visited, path):
     for call in calls[:5]:  # Limit branching
         callee = call.get("callee_fqn", "") or call.get("callee", "")
         if callee and callee not in visited:
-            candidate = _dfs_longest(api, callee, visited.copy(), path)
-            if len(candidate) > len(longest):
+            # Heuristic: penalize utility functions so they don't dominate the longest path
+            callee_lower = callee.lower()
+            is_util = any(x in callee_lower for x in ["util", "helper", "log", "print", "format", "error"])
+            new_penalty = penalty + (2 if is_util else 0)
+            
+            if new_penalty > 4: # Cut off paths that dive too deep into utilities
+                continue
+                
+            candidate = _dfs_longest(api, callee, visited.copy(), path, new_penalty)
+            # Subtract penalty from the path length to find the most "valuable" path
+            candidate_score = len(candidate) - new_penalty
+            longest_score = len(longest) - penalty
+            
+            if candidate_score > longest_score:
                 longest = candidate
 
     return longest
