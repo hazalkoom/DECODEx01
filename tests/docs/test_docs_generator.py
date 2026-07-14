@@ -13,7 +13,7 @@ def test_generate_docs(populated_db, temp_db_path, tmp_path):
         "SETUP.md", "PROJECT_OVERVIEW.md", "ARCHITECTURE.md", "MODULE_GUIDE.md",
         "DATA_FLOW.md", "DATA_MODEL.md", "READING_GUIDE.md",
         "IMPORTANT_FILES.md", "DEPENDENCY_GUIDE.md", "CALL_FLOW.md",
-        "PROJECT_MAP.md", "GLOSSARY.md"
+        "PROJECT_MAP.md", "GLOSSARY.md", "STORY_OF_A_REQUEST.md"
     ]
     for f in expected_files:
         assert (output_dir / f).exists()

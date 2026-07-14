@@ -31,3 +31,5 @@ Use it to understand the codebase quickly.
 | [Project Map](PROJECT_MAP.md) | How is the repository laid out? |
 
 | [Glossary](GLOSSARY.md) | What do project-specific terms mean? |
+
+| [Story of a Request](STORY_OF_A_REQUEST.md) | What happens when the application runs? |

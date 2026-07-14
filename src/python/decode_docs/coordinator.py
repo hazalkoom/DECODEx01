@@ -15,6 +15,8 @@ from .generators.project_map import ProjectMapGenerator
 from .generators.glossary import GlossaryGenerator
 
 from .generators.setup_guide import SetupGuideGenerator
+from .generators.api_reference import ApiReferenceGenerator
+from .generators.story_of_request import StoryOfRequestGenerator
 
 class DocsCoordinator:
     def __init__(self, db_path: str, output_dir: str, project_root: str = "."):
@@ -47,6 +49,7 @@ class DocsCoordinator:
         
         self.generators = [
             SetupGuideGenerator(self.api, self.env, self.project_root),
+            ApiReferenceGenerator(self.api, self.env, self.project_root),
             ProjectOverviewGenerator(self.api, self.env),
             ArchitectureGenerator(self.api, self.env),
             ModuleGuideGenerator(self.api, self.env),
@@ -58,6 +61,7 @@ class DocsCoordinator:
             CallFlowGenerator(self.api, self.env),
             ProjectMapGenerator(self.api, self.env),
             GlossaryGenerator(self.api, self.env),
+            StoryOfRequestGenerator(self.api, self.env),
         ]
         
     def generate_all(self) -> dict:
