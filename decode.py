@@ -37,6 +37,8 @@ def main():
     docs_parser = subparsers.add_parser("docs", help="Generate Markdown documentation from the indexed database")
     docs_parser.add_argument("--output", default="docs", help="Output directory (default: docs)")
     docs_parser.add_argument("--db", default="decode_graph.db", help="Path to the SQLite database")
+    docs_parser.add_argument("--ai", action="store_true", help="Use AI to generate high-quality human-readable docs (requires API key)")
+    docs_parser.add_argument("--root", default=".", help="Project root path to scan config files for CONTRIBUTING.md (default: .)")
 
     # Command 6: decode pack
     pack_parser = subparsers.add_parser("pack", help="Consolidate the codebase snapshot and status memory into a single CONTEXT_BUNDLE.xml file")
@@ -73,8 +75,12 @@ def main():
         generate_snapshot(args.db, ".", args.output)
 
     elif args.command == "docs":
-        from python.decode_docs.docs_generator import generate_docs
-        generate_docs(args.db, ".", args.output)
+        if args.ai:
+            from python.decode_docs.ai.ai_docs_generator import generate_ai_docs
+            generate_ai_docs(args.db, args.root, args.output)
+        else:
+            from python.decode_docs.docs_generator import generate_docs
+            generate_docs(args.db, ".", args.output)
             
     elif args.command == "graph":
         from python.decode_graphs.graph_generator import render_dependency_graph, render_call_graph, render_inheritance_graph
