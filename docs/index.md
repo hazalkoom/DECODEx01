@@ -8,6 +8,8 @@ Use it to understand the codebase quickly.
 | Document | Question It Answers |
 |----------|-------------------|
 
+| [Setup Guide](SETUP.md) | How do I get this project running? |
+
 | [Project Overview](PROJECT_OVERVIEW.md) | What is this project? |
 
 | [Architecture](ARCHITECTURE.md) | How is it organized? |

@@ -14,10 +14,13 @@ from .generators.call_flow import CallFlowGenerator
 from .generators.project_map import ProjectMapGenerator
 from .generators.glossary import GlossaryGenerator
 
+from .generators.setup_guide import SetupGuideGenerator
+
 class DocsCoordinator:
-    def __init__(self, db_path: str, output_dir: str):
+    def __init__(self, db_path: str, output_dir: str, project_root: str = "."):
         self.api = DBQueryAPI(db_path)
         self.output_dir = output_dir
+        self.project_root = project_root
         template_dir = os.path.join(os.path.dirname(__file__), "templates")
         self.env = Environment(loader=FileSystemLoader(template_dir))
         
@@ -43,6 +46,7 @@ class DocsCoordinator:
         self.env.globals["generate_glossary_prose"] = generate_glossary_prose
         
         self.generators = [
+            SetupGuideGenerator(self.api, self.env, self.project_root),
             ProjectOverviewGenerator(self.api, self.env),
             ArchitectureGenerator(self.api, self.env),
             ModuleGuideGenerator(self.api, self.env),

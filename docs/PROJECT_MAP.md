@@ -4,7 +4,7 @@
 
 ## Directory: `root`
 
-The project directory structure is designed to separate concerns. In the `root` directory, you will find 8 files primarily written in Plain Text, Markdown, Unknown, and Python.
+The project directory structure is designed to separate concerns. In the `root` directory, you will find 8 files primarily written in Plain Text, Unknown, Python, and Markdown.
 
 ---
 
@@ -16,7 +16,7 @@ The project directory structure is designed to separate concerns. In the `covera
 
 ## Directory: `coverage_reports/cpp/html`
 
-The project directory structure is designed to separate concerns. In the `coverage_reports/cpp/html` directory, you will find 10 files primarily written in HTML, CSS, Unknown, and JavaScript.
+The project directory structure is designed to separate concerns. In the `coverage_reports/cpp/html` directory, you will find 10 files primarily written in Unknown, HTML, CSS, and JavaScript.
 
 ---
 
@@ -34,13 +34,13 @@ The project directory structure is designed to separate concerns. In the `lib/bi
 
 ## Directory: `lib/tom-select`
 
-The project directory structure is designed to separate concerns. In the `lib/tom-select` directory, you will find 2 files primarily written in JavaScript and CSS.
+The project directory structure is designed to separate concerns. In the `lib/tom-select` directory, you will find 2 files primarily written in CSS and JavaScript.
 
 ---
 
 ## Directory: `lib/vis-9.1.2`
 
-The project directory structure is designed to separate concerns. In the `lib/vis-9.1.2` directory, you will find 2 files primarily written in JavaScript and CSS.
+The project directory structure is designed to separate concerns. In the `lib/vis-9.1.2` directory, you will find 2 files primarily written in CSS and JavaScript.
 
 ---
 

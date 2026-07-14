@@ -4,7 +4,7 @@
 
 ## Workflow: main
 
-The `main` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_main.cpp`. From there, it coordinates with 82 different components. The primary interactions involve `Network`, `first`, and `in_`.
+The `main` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_main.cpp`. From there, it coordinates with 82 different components. The primary interactions involve `add`, `open`, and `Network`.
 
 ```mermaid
 graph TD
@@ -92,7 +92,7 @@ graph TD
 
 ## Workflow: DBQueryAPI.get_domain_entities
 
-The `get_domain_entities` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 11 different components. The primary interactions involve `any`, `SessionLocal`, and `join`.
+The `get_domain_entities` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 11 different components. The primary interactions involve `any`, `all`, and `query`.
 
 ```mermaid
 graph TD
@@ -162,7 +162,7 @@ graph TD
 
 ## Workflow: J.onClick
 
-The `onClick` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `clearActiveItems`, `focus`, and `blur`.
+The `onClick` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `blur`, `focus`, and `clearActiveItems`.
 
 ```mermaid
 graph TD
@@ -188,7 +188,7 @@ graph TD
 
 ## Workflow: J.setup
 
-The `setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 57 different components. The primary interactions involve `preload`, `onFocus`, and `stopPropagation`.
+The `setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 57 different components. The primary interactions involve `o`, `insertAdjacentElement`, and `create`.
 
 ```mermaid
 graph TD
@@ -258,7 +258,7 @@ graph TD
 
 ## Workflow: J.setupOptions
 
-The `setupOptions` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `registerOptionGroup`, `y`, and `addOptions`.
+The `setupOptions` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 3 different components. The primary interactions involve `y`, `registerOptionGroup`, and `addOptions`.
 
 ```mermaid
 graph TD
@@ -280,7 +280,7 @@ graph TD
 
 ## Workflow: J.setupTemplates
 
-The `setupTemplates` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 73 different components. The primary interactions involve `random`, `vg`, and `split`.
+The `setupTemplates` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 73 different components. The primary interactions involve `Cm`, `_determineBrowserMethod`, and `lu`.
 
 ```mermaid
 graph TD
@@ -364,7 +364,7 @@ graph TD
 
 ## Workflow: test_schema_setup
 
-The `test_schema_setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_manager.py`. From there, it coordinates with 5 different components. The primary interactions involve `len`, `select`, and `SessionLocal`.
+The `test_schema_setup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_manager.py`. From there, it coordinates with 5 different components. The primary interactions involve `select`, `execute`, and `all`.
 
 ```mermaid
 graph TD
@@ -460,314 +460,144 @@ graph TD
 
 ```
 
-## Workflow: DBManager.ingest_project_data
+## Workflow: DBQueryAPI.get_class_hierarchy_full
 
-The `ingest_project_data` workflow represents a critical path in the system. When this flow is triggered, execution begins in `manager.py`. From there, it coordinates with 7 different components. The primary interactions involve `len`, `SessionLocal`, and `execute`.
+The `get_class_hierarchy_full` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 6 different components. The primary interactions involve `select`, `execute`, and `all`.
 
 ```mermaid
 graph TD
-    Start[DBManager_ingest_project_data]
+    Start[DBQueryAPI_get_class_hierarchy_full]
 
 
-    DBManager_ingest_project_data --> SessionLocal
-
-
-
-    DBManager_ingest_project_data --> execute
+    DBQueryAPI_get_class_hierarchy_full --> SessionLocal
 
 
 
-    DBManager_ingest_project_data --> insert
+    DBQueryAPI_get_class_hierarchy_full --> select
 
 
 
-    DBManager_ingest_project_data --> range
+    DBQueryAPI_get_class_hierarchy_full --> join
 
 
 
-    DBManager_ingest_project_data --> len
+    DBQueryAPI_get_class_hierarchy_full --> where
 
 
 
-    DBManager_ingest_project_data --> execute
+    DBQueryAPI_get_class_hierarchy_full --> execute
 
 
 
-    DBManager_ingest_project_data --> insert
-
-
-
-    DBManager_ingest_project_data --> range
-
-
-
-    DBManager_ingest_project_data --> len
-
-
-
-    DBManager_ingest_project_data --> execute
-
-
-
-    DBManager_ingest_project_data --> insert
-
-
-
-    DBManager_ingest_project_data --> range
-
-
-
-    DBManager_ingest_project_data --> len
-
-
-
-    DBManager_ingest_project_data --> execute
-
-
-
-    DBManager_ingest_project_data --> insert
+    DBQueryAPI_get_class_hierarchy_full --> all
 
 
 ```
 
-## Workflow: DBQueryAPI.find_files_importing
+## Workflow: DBQueryAPI.get_dependency_clusters
 
-The `find_files_importing` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 7 different components. The primary interactions involve `select`, `where`, and `SessionLocal`.
+The `get_dependency_clusters` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 1 different components. The primary interactions involve `get_module_structure`.
 
 ```mermaid
 graph TD
-    Start[DBQueryAPI_find_files_importing]
+    Start[DBQueryAPI_get_dependency_clusters]
 
 
-    DBQueryAPI_find_files_importing --> SessionLocal
-
-
-
-    DBQueryAPI_find_files_importing --> select
-
-
-
-    DBQueryAPI_find_files_importing --> join
-
-
-
-    DBQueryAPI_find_files_importing --> where
-
-
-
-    DBQueryAPI_find_files_importing --> like
-
-
-
-    DBQueryAPI_find_files_importing --> execute
-
-
-
-    DBQueryAPI_find_files_importing --> all
+    DBQueryAPI_get_dependency_clusters --> get_module_structure
 
 
 ```
 
-## Workflow: DBQueryAPI.get_class_hierarchy
+## Workflow: J.addOption
 
-The `get_class_hierarchy` workflow represents a critical path in the system. When this flow is triggered, execution begins in `query_api.py`. From there, it coordinates with 6 different components. The primary interactions involve `select`, `where`, and `SessionLocal`.
+The `addOption` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 5 different components. The primary interactions involve `q`, `addOptions`, and `hasOwnProperty`.
 
 ```mermaid
 graph TD
-    Start[DBQueryAPI_get_class_hierarchy]
+    Start[J_addOption]
 
 
-    DBQueryAPI_get_class_hierarchy --> SessionLocal
-
-
-
-    DBQueryAPI_get_class_hierarchy --> select
+    J_addOption --> isArray
 
 
 
-    DBQueryAPI_get_class_hierarchy --> join
+    J_addOption --> addOptions
 
 
 
-    DBQueryAPI_get_class_hierarchy --> where
+    J_addOption --> q
 
 
 
-    DBQueryAPI_get_class_hierarchy --> execute
+    J_addOption --> hasOwnProperty
 
 
 
-    DBQueryAPI_get_class_hierarchy --> all
+    J_addOption --> trigger
 
 
 ```
 
-## Workflow: J.addOptionGroup
+## Workflow: J.onFocus
 
-The `addOptionGroup` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 2 different components. The primary interactions involve `registerOptionGroup` and `trigger`.
+The `onFocus` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 7 different components. The primary interactions involve `refreshOptions`, `H`, and `showInput`.
 
 ```mermaid
 graph TD
-    Start[J_addOptionGroup]
+    Start[J_onFocus]
 
 
-    J_addOptionGroup --> registerOptionGroup
+    J_onFocus --> blur
 
 
 
-    J_addOptionGroup --> trigger
+    J_onFocus --> H
+
+
+
+    J_onFocus --> preload
+
+
+
+    J_onFocus --> trigger
+
+
+
+    J_onFocus --> showInput
+
+
+
+    J_onFocus --> refreshOptions
+
+
+
+    J_onFocus --> refreshState
 
 
 ```
 
-## Workflow: J.clearActiveItems
+## Workflow: J.selectAll
 
-The `clearActiveItems` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 1 different components. The primary interactions involve `S`.
-
-```mermaid
-graph TD
-    Start[J_clearActiveItems]
-
-
-    J_clearActiveItems --> S
-
-
-```
-
-## Workflow: J.clearOptions
-
-The `clearOptions` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 4 different components. The primary interactions involve `clearCache`, `y`, and `trigger`.
+The `selectAll` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 5 different components. The primary interactions involve `hideInput`, `controlChildren`, and `close`.
 
 ```mermaid
 graph TD
-    Start[J_clearOptions]
+    Start[J_selectAll]
 
 
-    J_clearOptions --> clearCache
+    J_selectAll --> controlChildren
 
 
 
-    J_clearOptions --> y
+    J_selectAll --> hideInput
 
 
 
-    J_clearOptions --> indexOf
+    J_selectAll --> close
 
 
 
-    J_clearOptions --> trigger
-
-
-```
-
-## Workflow: J.destroy
-
-The `destroy` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 5 different components. The primary interactions involve `trigger`, `_destroy`, and `off`.
-
-```mermaid
-graph TD
-    Start[J_destroy]
-
-
-    J_destroy --> trigger
-
-
-
-    J_destroy --> off
-
-
-
-    J_destroy --> remove
-
-
-
-    J_destroy --> remove
-
-
-
-    J_destroy --> S
-
-
-
-    J_destroy --> _destroy
-
-
-```
-
-## Workflow: J.onInput
-
-The `onInput` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 5 different components. The primary interactions involve `trigger`, `load`, and `refreshOptions`.
-
-```mermaid
-graph TD
-    Start[J_onInput]
-
-
-    J_onInput --> inputValue
-
-
-
-    J_onInput --> call
-
-
-
-    J_onInput --> load
-
-
-
-    J_onInput --> refreshOptions
-
-
-
-    J_onInput --> trigger
-
-
-```
-
-## Workflow: J.selectable
-
-The `selectable` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 1 different components. The primary interactions involve `querySelectorAll`.
-
-```mermaid
-graph TD
-    Start[J_selectable]
-
-
-    J_selectable --> querySelectorAll
-
-
-```
-
-## Workflow: J.setActiveItemClass
-
-The `setActiveItemClass` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 6 different components. The primary interactions involve `trigger`, `push`, and `querySelector`.
-
-```mermaid
-graph TD
-    Start[J_setActiveItemClass]
-
-
-    J_setActiveItemClass --> querySelector
-
-
-
-    J_setActiveItemClass --> S
-
-
-
-    J_setActiveItemClass --> C
-
-
-
-    J_setActiveItemClass --> trigger
-
-
-
-    J_setActiveItemClass --> indexOf
-
-
-
-    J_setActiveItemClass --> push
+    J_selectAll --> C
 
 
 
@@ -776,266 +606,288 @@ graph TD
 
 ```
 
-## Workflow: J.uncacheValue
+## Workflow: ModuleGuideGenerator.gather_data
 
-The `uncacheValue` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 2 different components. The primary interactions involve `remove` and `getOption`.
+The `gather_data` workflow represents a critical path in the system. When this flow is triggered, execution begins in `module_guide.py`. From there, it coordinates with 1 different components. The primary interactions involve `get_module_structure`.
 
 ```mermaid
 graph TD
-    Start[J_uncacheValue]
+    Start[ModuleGuideGenerator_gather_data]
 
 
-    J_uncacheValue --> getOption
-
-
-
-    J_uncacheValue --> remove
+    ModuleGuideGenerator_gather_data --> get_module_structure
 
 
 ```
 
-## Workflow: TestCppReturnTypes.test_bool_return_type
+## Workflow: ProjectMapGenerator.gather_data
 
-The `test_bool_return_type` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_return_types.py`. From there, it coordinates with 1 different components. The primary interactions involve `_parse`.
+The `gather_data` workflow represents a critical path in the system. When this flow is triggered, execution begins in `project_map.py`. From there, it coordinates with 1 different components. The primary interactions involve `get_module_structure`.
 
 ```mermaid
 graph TD
-    Start[TestCppReturnTypes_test_bool_return_type]
+    Start[ProjectMapGenerator_gather_data]
 
 
-    TestCppReturnTypes_test_bool_return_type --> _parse
+    ProjectMapGenerator_gather_data --> get_module_structure
 
 
 ```
 
-## Workflow: qg
+## Workflow: TestCppInheritance.test_inheritance_caller_is_child_class
 
-The `qg` workflow represents a critical path in the system. When this flow is triggered, execution begins in `vis-network.min.js`. From there, it coordinates with 10 different components. The primary interactions involve `mg`, `jg`, and `push`.
+The `test_inheritance_caller_is_child_class` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_inheritance.py`. From there, it coordinates with 3 different components. The primary interactions involve `dedent`, `any`, and `_parse`.
 
 ```mermaid
 graph TD
-    Start[qg]
+    Start[TestCppInheritance_test_inheritance_caller_is_child_class]
 
 
-    qg --> jg
-
-
-
-    qg --> jg
+    TestCppInheritance_test_inheritance_caller_is_child_class --> dedent
 
 
 
-    qg --> filter
+    TestCppInheritance_test_inheritance_caller_is_child_class --> _parse
 
 
 
-    qg --> mg
-
-
-
-    qg --> push
-
-
-
-    qg --> Rg
-
-
-
-    qg --> concat
-
-
-
-    jg --> call
-
-
-
-    Rg --> Ig
-
-
-
-    Rg --> push
-
-
-
-    Rg --> sort
-
-
-
-    Rg --> sort
-
-
-
-    Ig --> indexOf
+    TestCppInheritance_test_inheritance_caller_is_child_class --> any
 
 
 ```
 
-## Workflow: test_bash_basic_symbols
+## Workflow: b.getScoreFunction
 
-The `test_bash_basic_symbols` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_bash.py`. From there, it coordinates with 5 different components. The primary interactions involve `len`, `ASTParser`, and `dedent`.
+The `getScoreFunction` workflow represents a critical path in the system. When this flow is triggered, execution begins in `tom-select.complete.min.js`. From there, it coordinates with 2 different components. The primary interactions involve `prepareSearch` and `_getScoreFunction`.
 
 ```mermaid
 graph TD
-    Start[test_bash_basic_symbols]
+    Start[b_getScoreFunction]
 
 
-    test_bash_basic_symbols --> ASTParser
-
-
-
-    test_bash_basic_symbols --> set_language
+    b_getScoreFunction --> prepareSearch
 
 
 
-    test_bash_basic_symbols --> dedent
-
-
-
-    test_bash_basic_symbols --> extract_symbols
-
-
-
-    test_bash_basic_symbols --> len
+    b_getScoreFunction --> _getScoreFunction
 
 
 ```
 
-## Workflow: test_get_class_hierarchy_success
+## Workflow: highlightFilter
 
-The `test_get_class_hierarchy_success` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_query_api_references.py`. From there, it coordinates with 2 different components. The primary interactions involve `len` and `get_class_hierarchy`.
+The `highlightFilter` workflow represents a critical path in the system. When this flow is triggered, execution begins in `utils.js`. From there, it coordinates with 8 different components. The primary interactions involve `toString`, `update`, and `selectNodes`.
 
 ```mermaid
 graph TD
-    Start[test_get_class_hierarchy_success]
+    Start[highlightFilter]
 
 
-    test_get_class_hierarchy_success --> get_class_hierarchy
+    highlightFilter --> get
 
 
 
-    test_get_class_hierarchy_success --> len
+    highlightFilter --> includes
+
+
+
+    highlightFilter --> toString
+
+
+
+    highlightFilter --> push
+
+
+
+    highlightFilter --> get
+
+
+
+    highlightFilter --> includes
+
+
+
+    highlightFilter --> toString
+
+
+
+    highlightFilter --> push
+
+
+
+    highlightFilter --> push
+
+
+
+    highlightFilter --> selectNodes
+
+
+
+    selectNodes --> selectNodes
+
+
+
+    selectNodes --> filterHighlight
+
+
+
+    filterHighlight --> get
+
+
+
+    filterHighlight --> hasOwnProperty
+
+
+
+    filterHighlight --> push
 
 
 ```
 
-## Workflow: test_get_file_outline_success
+## Workflow: set_sqlite_pragma
 
-The `test_get_file_outline_success` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_query_api.py`. From there, it coordinates with 3 different components. The primary interactions involve `len`, `get_file_outline`, and `sorted`.
+The `set_sqlite_pragma` workflow represents a critical path in the system. When this flow is triggered, execution begins in `manager.py`. From there, it coordinates with 3 different components. The primary interactions involve `close`, `cursor`, and `execute`.
 
 ```mermaid
 graph TD
-    Start[test_get_file_outline_success]
+    Start[set_sqlite_pragma]
 
 
-    test_get_file_outline_success --> get_file_outline
-
-
-
-    test_get_file_outline_success --> len
+    set_sqlite_pragma --> cursor
 
 
 
-    test_get_file_outline_success --> sorted
+    set_sqlite_pragma --> execute
+
+
+
+    set_sqlite_pragma --> execute
+
+
+
+    set_sqlite_pragma --> execute
+
+
+
+    set_sqlite_pragma --> execute
+
+
+
+    set_sqlite_pragma --> close
 
 
 ```
 
-## Workflow: test_js_es6_exports
+## Workflow: test_cpp_inline_functions
 
-The `test_js_es6_exports` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_javascript.py`. From there, it coordinates with 5 different components. The primary interactions involve `len`, `ASTParser`, and `extract_dependencies`.
+The `test_cpp_inline_functions` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_cpp.py`. From there, it coordinates with 4 different components. The primary interactions involve `extract_symbols`, `len`, and `set_language`.
 
 ```mermaid
 graph TD
-    Start[test_js_es6_exports]
+    Start[test_cpp_inline_functions]
 
 
-    test_js_es6_exports --> ASTParser
-
-
-
-    test_js_es6_exports --> set_language
+    test_cpp_inline_functions --> ASTParser
 
 
 
-    test_js_es6_exports --> dedent
+    test_cpp_inline_functions --> set_language
 
 
 
-    test_js_es6_exports --> extract_dependencies
+    test_cpp_inline_functions --> extract_symbols
 
 
 
-    test_js_es6_exports --> len
+    test_cpp_inline_functions --> len
 
 
 ```
 
-## Workflow: test_remove_stale_files_cascade
+## Workflow: test_find_callers_of_missing
 
-The `test_remove_stale_files_cascade` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_manager.py`. From there, it coordinates with 7 different components. The primary interactions involve `len`, `SessionLocal`, and `first`.
+The `test_find_callers_of_missing` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_query_api_references.py`. From there, it coordinates with 3 different components. The primary interactions involve `find_callers_of`, `len`, and `isinstance`.
 
 ```mermaid
 graph TD
-    Start[test_remove_stale_files_cascade]
+    Start[test_find_callers_of_missing]
 
 
-    test_remove_stale_files_cascade --> SessionLocal
-
-
-
-    test_remove_stale_files_cascade --> query
+    test_find_callers_of_missing --> find_callers_of
 
 
 
-    test_remove_stale_files_cascade --> count
+    test_find_callers_of_missing --> isinstance
 
 
 
-    test_remove_stale_files_cascade --> query
+    test_find_callers_of_missing --> len
+
+
+```
+
+## Workflow: test_find_calls_by_missing
+
+The `test_find_calls_by_missing` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_query_api_references.py`. From there, it coordinates with 3 different components. The primary interactions involve `find_calls_by`, `len`, and `isinstance`.
+
+```mermaid
+graph TD
+    Start[test_find_calls_by_missing]
+
+
+    test_find_calls_by_missing --> find_calls_by
 
 
 
-    test_remove_stale_files_cascade --> count
+    test_find_calls_by_missing --> isinstance
 
 
 
-    test_remove_stale_files_cascade --> query
+    test_find_calls_by_missing --> len
+
+
+```
+
+## Workflow: test_js_basic_symbols
+
+The `test_js_basic_symbols` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_javascript.py`. From there, it coordinates with 5 different components. The primary interactions involve `dedent`, `ASTParser`, and `len`.
+
+```mermaid
+graph TD
+    Start[test_js_basic_symbols]
+
+
+    test_js_basic_symbols --> ASTParser
 
 
 
-    test_remove_stale_files_cascade --> count
+    test_js_basic_symbols --> set_language
 
 
 
-    test_remove_stale_files_cascade --> remove_stale_files
+    test_js_basic_symbols --> dedent
 
 
 
-    test_remove_stale_files_cascade --> SessionLocal
+    test_js_basic_symbols --> extract_symbols
 
 
 
-    test_remove_stale_files_cascade --> query
+    test_js_basic_symbols --> len
 
 
+```
 
-    test_remove_stale_files_cascade --> count
+## Workflow: test_qa_sloppy_shebangs
 
+The `test_qa_sloppy_shebangs` workflow represents a critical path in the system. When this flow is triggered, execution begins in `test_language_qa.py`. From there, it coordinates with 1 different components. The primary interactions involve `detect_language`.
 
-
-    test_remove_stale_files_cascade --> query
-
-
-
-    test_remove_stale_files_cascade --> first
-
+```mermaid
+graph TD
+    Start[test_qa_sloppy_shebangs]
 
 
-    test_remove_stale_files_cascade --> query
-
-
-
-    test_remove_stale_files_cascade --> all
+    test_qa_sloppy_shebangs --> detect_language
 
 
 ```
