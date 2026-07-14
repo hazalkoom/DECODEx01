@@ -47,7 +47,7 @@ bool ASTParser::set_language(const std::string& lang_name) {
             "(call_expression function: (identifier) @callee_name) "
             "(call_expression function: (member_expression property: (property_identifier) @callee_name))";
     }
-    else if (lang_name == "C++" || lang_name == "cpp") {
+    else if (lang_name == "C++" || lang_name == "cpp" || lang_name == "c++") {
         current_language = tree_sitter_cpp();
         symbol_query_str = 
             "(class_specifier name: (type_identifier) @class_name) "

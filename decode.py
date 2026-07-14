@@ -24,12 +24,31 @@ def main():
 
     # Command 3: decode graph (Our upcoming Sandbox!)
     graph_parser = subparsers.add_parser("graph", help="Generate a visual dependency graph using Raw SQL")
-    graph_parser.add_argument("target", help="The file or module to map dependencies for")
+    graph_parser.add_argument("--type", choices=["deps", "calls", "inheritance"], default="deps")
+    graph_parser.add_argument("target", nargs="?", default=None, help="The file or module to map dependencies for")
+    graph_parser.add_argument("--db", default="decode_graph.db", help="Path to the SQLite database")
 
     # Command 4: decode snapshot
     snap_parser = subparsers.add_parser("snapshot", help="Generate AI-friendly .decode/ context folder from the indexed DB")
     snap_parser.add_argument("--output", default=".decode", help="Output directory (default: .decode)")
     snap_parser.add_argument("--db", default="decode_graph.db", help="Path to the SQLite database")
+
+    # Command 5: decode docs
+    docs_parser = subparsers.add_parser("docs", help="Generate Markdown documentation from the indexed database")
+    docs_parser.add_argument("--output", default="docs", help="Output directory (default: docs)")
+    docs_parser.add_argument("--db", default="decode_graph.db", help="Path to the SQLite database")
+
+    # Command 6: decode pack
+    pack_parser = subparsers.add_parser("pack", help="Consolidate the codebase snapshot and status memory into a single CONTEXT_BUNDLE.xml file")
+    pack_parser.add_argument("--output", default=".decode/CONTEXT_BUNDLE.xml", help="Output file path")
+    pack_parser.add_argument("--db", default="decode_graph.db", help="Path to the SQLite database")
+
+    # Command 7: decode context
+    context_parser = subparsers.add_parser("context", help="Generate a focused XML context bundle mapping the dependencies of a target file")
+    context_parser.add_argument("--focus", required=True, help="Target file name or path to focus the context on")
+    context_parser.add_argument("--output", default=".decode/FOCUSED_CONTEXT.xml", help="Output file path")
+    context_parser.add_argument("--db", default="decode_graph.db", help="Path to the SQLite database")
+    context_parser.add_argument("--depth", type=int, default=2, help="Recursive traversal depth (default: 2)")
 
     # Parse the arguments typed in the terminal
     args = parser.parse_args()
@@ -52,108 +71,33 @@ def main():
     elif args.command == "snapshot":
         from python.decode_snapshot.snapshot_generator import generate_snapshot
         generate_snapshot(args.db, ".", args.output)
+
+    elif args.command == "docs":
+        from python.decode_docs.docs_generator import generate_docs
+        generate_docs(args.db, ".", args.output)
             
     elif args.command == "graph":
-        print(f"🕸️  Tracing deep dependency tree for: {args.target}")
-        from sqlalchemy import create_engine, text
-        from pyvis.network import Network
-        
-        engine = create_engine("sqlite:///decode_graph.db")
-        
-        with engine.connect() as conn:
-            # THE RECURSIVE CTE
-            query = text("""
-                WITH RECURSIVE dep_tree AS (
-                    SELECT 
-                        f.filepath AS source_file, 
-                        d.module_name AS imported_module, 
-                        1 AS depth
-                    FROM files f
-                    JOIN dependencies d ON f.id = d.file_id
-                    WHERE f.filepath LIKE :target
-                    
-                    UNION
-                    
-                    SELECT 
-                        f.filepath, 
-                        d.module_name, 
-                        dt.depth + 1
-                    FROM files f
-                    JOIN dependencies d ON f.id = d.file_id
-                    JOIN dep_tree dt 
-                        ON f.filepath LIKE '%' || replace(dt.imported_module, '.', '/') || '.py'
-                    WHERE dt.depth < 5
-                )
-                SELECT DISTINCT source_file, imported_module, depth 
-                FROM dep_tree 
-                ORDER BY depth, source_file;
-            """)
-            
-            results = conn.execute(query, {"target": f"%{args.target}%"}).fetchall()
-            
-            if not results:
-                print("   ❌ No dependencies found.")
-            else:
-                print("🎨 Generating strictly hierarchical architecture map...")
-                
-                # Setup a dark-mode canvas
-                net = Network(height="800px", width="100%", bgcolor="#1e1e1e", font_color="white", directed=True)
-                
-                # FORCE A PROFESSIONAL TOP-DOWN TREE LAYOUT
-                net.set_options("""
-                var options = {
-                  "layout": {
-                    "hierarchical": {
-                      "enabled": true,
-                      "direction": "UD",
-                      "sortMethod": "directed",
-                      "levelSeparation": 150,
-                      "nodeSpacing": 150
-                    }
-                  },
-                  "physics": {
-                    "hierarchicalRepulsion": {
-                      "nodeDistance": 150
-                    }
-                  },
-                  "edges": {
-                    "smooth": {
-                      "type": "cubicBezier",
-                      "forceDirection": "vertical",
-                      "roundness": 0.4
-                    }
-                  }
-                }
-                """)
-                
-                # Track what we've added to avoid Pyvis duplicate node errors
-                added_nodes = set()
-                
-                for source, module, depth in results:
-                    clean_source = source.split('/')[-1]
-                    
-                    # 1. Add the Source File Node
-                    if clean_source not in added_nodes:
-                        net.add_node(clean_source, label=clean_source, color="#E53935", shape="box", font={"face": "monospace", "size": 16})
-                        added_nodes.add(clean_source)
-                    
-                    # 2. Add the Target Module Node
-                    if module not in added_nodes:
-                        # If it's a standard library or third-party (like os, pytest, sqlalchemy), make it small and gray
-                        if not module.startswith('.') and "decode" not in module and "schema" not in module:
-                            net.add_node(module, label=module, color="#424242", shape="dot", size=10, font={"size": 10, "color": "gray"})
-                        else:
-                            # Internal project files get the premium purple highlight
-                            net.add_node(module, label=module, color="#8E24AA", shape="box", font={"face": "monospace", "size": 16})
-                        added_nodes.add(module)
-                        
-                    # 3. Draw the connection
-                    net.add_edge(clean_source, module, color="#555555")
+        from python.decode_graphs.graph_generator import render_dependency_graph, render_call_graph, render_inheritance_graph
+        if args.type == "deps":
+            if not args.target:
+                print("❌ Target is required for dependency graph")
+                sys.exit(1)
+            render_dependency_graph(args.target, args.db)
+        elif args.type == "calls":
+            if not args.target:
+                print("❌ Target (symbol) is required for call graph")
+                sys.exit(1)
+            render_call_graph(args.target, args.db)
+        elif args.type == "inheritance":
+            render_inheritance_graph(args.db)
 
-                output_file = "architecture_map.html"
-                net.save_graph(output_file)
-                
-                print(f"✅ Premium hierarchical graph saved to: {output_file}")
+    elif args.command == "pack":
+        from python.decode_snapshot.snapshot_generator import generate_xml_bundle
+        generate_xml_bundle(args.db, args.output)
+
+    elif args.command == "context":
+        from python.decode_snapshot.snapshot_generator import generate_focused_xml_bundle
+        generate_focused_xml_bundle(args.db, args.focus, args.output, args.depth)
 
 if __name__ == "__main__":
     main()

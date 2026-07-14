@@ -1,0 +1,34 @@
+<codebase_context>
+    <session_status>
+        <![CDATA[{{ session_status_content }}]]>
+    </session_status>
+    <project_summary>
+        <total_files>{{ stats.total_files }}</total_files>
+        <total_classes>{{ stats.total_classes }}</total_classes>
+        <total_functions>{{ stats.total_functions }}</total_functions>
+        <total_references>{{ stats.total_references }}</total_references>
+    </project_summary>
+    <files>
+        {% for file in files %}
+        <file path="{{ file.filepath }}" language="{{ file.language }}">
+            <dependencies>
+                {% for dep in file.imports %}
+                <dependency>{{ dep }}</dependency>
+                {% endfor %}
+            </dependencies>
+            <symbols>
+                {% for sym in file.symbols %}
+                <symbol name="{{ sym.name }}" kind="{{ sym.kind }}" signature="{{ sym.signature }}" return_type="{{ sym.return_type }}">
+                    {% if sym.docstring %}<docstring><![CDATA[{{ sym.docstring }}]]></docstring>{% endif %}
+                </symbol>
+                {% endfor %}
+            </symbols>
+            <references>
+                {% for ref in file.calls %}
+                <reference direction="{{ ref.direction }}" symbol="{{ ref.symbol }}" file="{{ ref.file }}" line="{{ ref.line }}" />
+                {% endfor %}
+            </references>
+        </file>
+        {% endfor %}
+    </files>
+</codebase_context>

@@ -24,6 +24,40 @@ std::string SymbolExtractor::extract_docstring(TSNode node, const std::string& s
             break; // Stop when we hit actual code structures
         }
     }
+
+    // Python-specific internal docstrings (string literal as the first statement in the body block)
+    std::string parent_type = ts_node_type(node);
+    if (parent_type == "function_definition" || parent_type == "class_definition") {
+        TSNode body = ts_node_child_by_field_name(node, "body", 4);
+        if (!ts_node_is_null(body) && ts_node_type(body) == "block") {
+            uint32_t child_count = ts_node_child_count(body);
+            if (child_count > 0) {
+                TSNode first_stmt = ts_node_child(body, 0);
+                if (!ts_node_is_null(first_stmt) && ts_node_type(first_stmt) == "expression_statement") {
+                    TSNode expr = ts_node_child(first_stmt, 0);
+                    if (!ts_node_is_null(expr) && ts_node_type(expr) == "string") {
+                        std::string python_doc = extract_text(expr, source_code);
+                        // Strip quotes
+                        if (python_doc.size() >= 6 && python_doc.substr(0, 3) == "\"\"\"" && python_doc.substr(python_doc.size() - 3) == "\"\"\"") {
+                            python_doc = python_doc.substr(3, python_doc.size() - 6);
+                        } else if (python_doc.size() >= 6 && python_doc.substr(0, 3) == "'''" && python_doc.substr(python_doc.size() - 3) == "'''") {
+                            python_doc = python_doc.substr(3, python_doc.size() - 6);
+                        } else if (python_doc.size() >= 2 && python_doc.front() == '"' && python_doc.back() == '"') {
+                            python_doc = python_doc.substr(1, python_doc.size() - 2);
+                        } else if (python_doc.size() >= 2 && python_doc.front() == '\'' && python_doc.back() == '\'') {
+                            python_doc = python_doc.substr(1, python_doc.size() - 2);
+                        }
+                        if (doc.empty()) {
+                            doc = python_doc;
+                        } else {
+                            doc = doc + "\n" + python_doc;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return doc;
 }
 

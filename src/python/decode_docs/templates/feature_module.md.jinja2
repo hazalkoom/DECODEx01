@@ -1,0 +1,193 @@
+# Module: {{ feature_name }}
+
+> This module contains **{{ stats.num_classes }} classes**, **{{ stats.num_functions }} functions**, and **{{ stats.num_deps }} dependencies**.
+
+{% if ai_summary %}
+## Architectural Overview (AI Generated)
+{{ ai_summary }}
+
+---
+{% endif %}
+
+{% if module_dep_mermaid %}
+## Module Dependency Flow
+The following diagram illustrates the relationship and import flow between the files within this module:
+
+```mermaid
+{{ module_dep_mermaid }}
+```
+
+---
+{% endif %}
+
+{% for file in files %}
+## File: `{{ file.filename }}`
+*(Path: `{{ file.filepath }}`)*
+
+### Module Dependencies
+This file imports and depends on the following:
+{% if file.dependencies %}
+{% for dep in file.dependencies %}
+- `{{ dep.module }}` {% if dep.imported %}(specifically imports `{{ dep.imported }}`){% endif %} on line {{ dep.line }}
+{% endfor %}
+{% else %}
+*No imports detected.*
+{% endif %}
+
+{% if file.mermaid %}
+### Class Hierarchy
+```mermaid
+{{ file.mermaid }}
+```
+{% endif %}
+
+{% if file.classes %}
+### Classes
+
+{% for cls in file.classes %}
+#### `class {{ cls.name }}`
+{% if cls.docstring %}
+> {{ cls.docstring }}
+{% endif %}
+
+{% if cls.methods %}
+##### Methods & Interfaces
+
+{% for method in cls.methods %}
+{% if not method.is_private %}
+###### `{{ method.signature }}`
+- **Returns:** `{{ method.return_type }}`
+{% if method.docstring %}
+- **Documentation:** *{{ method.docstring }}*
+{% endif %}
+
+**Call Graph for `{{ method.name }}`:**
+
+| Call Direction | Symbol | Target Source File | Line |
+|---|---|---|---|
+{% for c in method.callers %}
+| 📥 Called By | `{{ c.caller }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% for c in method.callees %}
+| 📤 Calls | `{{ c.callee }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% if not method.callers and not method.callees %}
+| - | No call graph references found | - | - |
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+{% set ns = namespace(has_private=false) %}
+{% for method in cls.methods %}
+  {% if method.is_private %}
+    {% set ns.has_private = true %}
+  {% endif %}
+{% endfor %}
+
+{% if ns.has_private %}
+<details>
+<summary>Internal Helpers</summary>
+
+{% for method in cls.methods %}
+{% if method.is_private %}
+###### `{{ method.signature }}`
+- **Returns:** `{{ method.return_type }}`
+{% if method.docstring %}
+- **Documentation:** *{{ method.docstring }}*
+{% endif %}
+
+**Call Graph for internal `{{ method.name }}`:**
+
+| Call Direction | Symbol | Target Source File | Line |
+|---|---|---|---|
+{% for c in method.callers %}
+| 📥 Called By | `{{ c.caller }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% for c in method.callees %}
+| 📤 Calls | `{{ c.callee }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% if not method.callers and not method.callees %}
+| - | No call graph references found | - | - |
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+</details>
+{% endif %}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if file.functions %}
+### Standalone Functions
+
+{% for func in file.functions %}
+{% if not func.is_private %}
+#### `{{ func.signature }}`
+- **Returns:** `{{ func.return_type }}`
+{% if func.docstring %}
+- **Documentation:** *{{ func.docstring }}*
+{% endif %}
+
+**Call Graph for `{{ func.name }}`:**
+
+| Call Direction | Symbol | Target Source File | Line |
+|---|---|---|---|
+{% for c in func.callers %}
+| 📥 Called By | `{{ c.caller }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% for c in func.callees %}
+| 📤 Calls | `{{ c.callee }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% if not func.callers and not func.callees %}
+| - | No call graph references found | - | - |
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+{% set ns2 = namespace(has_private=false) %}
+{% for func in file.functions %}
+  {% if func.is_private %}
+    {% set ns2.has_private = true %}
+  {% endif %}
+{% endfor %}
+
+{% if ns2.has_private %}
+<details>
+<summary>Internal Helpers</summary>
+
+{% for func in file.functions %}
+{% if func.is_private %}
+#### `{{ func.signature }}`
+- **Returns:** `{{ func.return_type }}`
+{% if func.docstring %}
+- **Documentation:** *{{ func.docstring }}*
+{% endif %}
+
+**Call Graph for internal `{{ func.name }}`:**
+
+| Call Direction | Symbol | Target Source File | Line |
+|---|---|---|---|
+{% for c in func.callers %}
+| 📥 Called By | `{{ c.caller }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% for c in func.callees %}
+| 📤 Calls | `{{ c.callee }}` | `{{ c.file }}` | {{ c.line }} |
+{% endfor %}
+{% if not func.callers and not func.callees %}
+| - | No call graph references found | - | - |
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+</details>
+{% endif %}
+{% endif %}
+
+---
+{% endfor %}

@@ -1,0 +1,3 @@
+"""
+decode_docs module
+"""
