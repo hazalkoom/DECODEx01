@@ -285,9 +285,6 @@ def generate_snapshot(db_path: str = "decode_graph.db", project_root: str = ".",
     engine = create_engine(f"sqlite:///{db_path}")
     Session = sessionmaker(bind=engine)
     
-    context_dir = os.path.join(output_dir, "context")
-    os.makedirs(context_dir, exist_ok=True)
-    
     with Session() as session:
         stats = {}
         stats["Total Files"] = session.query(FileRecord).count()
@@ -350,41 +347,6 @@ def generate_snapshot(db_path: str = "decode_graph.db", project_root: str = ".",
         with open(os.path.join(output_dir, "SNAPSHOT.md"), "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
             
-        for f in files:
-            file_data = {
-                "filepath": f.filepath,
-                "language": f.language,
-                "symbols": [],
-                "imports": [],
-                "calls": []
-            }
-            
-            for sym in f.symbols:
-                file_data["symbols"].append({
-                    "name": sym.name,
-                    "fqn": sym.fully_qualified_name,
-                    "kind": sym.type,
-                    "signature": sym.signature,
-                    "return_type": sym.return_type,
-                    "docstring": sym.docstring,
-                    "lines": [sym.start_line, sym.end_line]
-                })
-                
-            for dep in f.dependencies:
-                file_data["imports"].append(dep.module_name)
-            file_data["imports"] = list(set(file_data["imports"]))
-                
-            for ref in f.references:
-                file_data["calls"].append({
-                    "from": ref.caller_fqn,
-                    "to": ref.callee_fqn,
-                    "kind": ref.kind,
-                    "line": ref.line_number
-                })
-                
-            filename = _sanitize_path(file_data["filepath"])
-            out_path = os.path.join(output_dir, "context", filename)
-            with open(out_path, "w", encoding="utf-8") as out_f:
-                json.dump(file_data, out_f, indent=2)
+    print(f"✅ Snapshot successfully saved to {output_dir}/")
                 
     print(f"✅ Snapshot successfully saved to {output_dir}/")

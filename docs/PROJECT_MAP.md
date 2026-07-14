@@ -4,7 +4,7 @@
 
 ## Directory: `root`
 
-The project directory structure is designed to separate concerns. In the `root` directory, you will find 8 files primarily written in Markdown, Unknown, Python, and Plain Text.
+The project directory structure is designed to separate concerns. In the `root` directory, you will find 8 files primarily written in Unknown, Python, Markdown, and Plain Text.
 
 ---
 

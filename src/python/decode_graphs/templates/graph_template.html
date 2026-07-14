@@ -6,14 +6,15 @@
 <title>Codebase Dependency Graph</title>
 
 <!-- Vis.js Network -->
-<script src="../../lib/vis-9.1.2/vis-network.min.js"></script>
-<link href="../../lib/vis-9.1.2/vis-network.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/standalone/umd/vis-network.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/standalone/umd/vis-network.min.css" rel="stylesheet" type="text/css" />
 
 <style>
   :root{
     --bg-0:#0a0e14;
     --bg-1:#0d1117;
     --panel-bg: rgba(22, 27, 38, 0.55);
+    --panel-bg-solid: rgba(17, 21, 31, 0.92);
     --panel-border: rgba(255,255,255,0.08);
     --accent: #61dafb;
     --accent-2: #a78bfa;
@@ -51,10 +52,11 @@
     top: 16px;
     left: 16px;
     right: 16px;
-    z-index: 20;
+    z-index: 25;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 10px;
     pointer-events: none;
   }
 
@@ -73,17 +75,20 @@
     font-weight: 600;
     font-size: 14px;
     letter-spacing: 0.3px;
+    white-space: nowrap;
   }
   .brand .dot{
     width: 9px; height: 9px; border-radius: 50%;
     background: var(--accent);
     box-shadow: 0 0 10px 2px var(--accent);
+    flex-shrink: 0;
   }
 
   .toolbar-actions{
     pointer-events: auto;
     display:flex;
     gap: 8px;
+    flex-wrap: nowrap;
   }
 
   .tbtn{
@@ -102,6 +107,8 @@
     gap:6px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.35);
     transition: all .18s ease;
+    white-space: nowrap;
+    user-select: none;
   }
   .tbtn:hover{
     border-color: var(--accent);
@@ -114,16 +121,63 @@
     box-shadow: 0 0 0 1px var(--accent-3), 0 0 16px rgba(52,211,153,0.35);
   }
 
-  /* ---------- Search ---------- */
-  .search-wrap{
-    position: fixed;
-    top: 70px;
-    left: 16px;
-    z-index: 20;
-    pointer-events: auto;
+  /* ---------- Legend popover ---------- */
+  .legend-wrap{ position: relative; }
+  .legend-popover{
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 190px;
+    background: var(--panel-bg-solid);
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    border-radius: 14px;
+    padding: 12px 14px;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: all .18s ease;
+    z-index: 30;
   }
+  .legend-popover.open{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .legend-title{
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-lo);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .legend-row{
+    display:flex;
+    align-items:center;
+    gap: 9px;
+    font-size: 12.5px;
+    padding: 4px 0;
+    color: var(--text-hi);
+  }
+  .legend-row svg{ flex-shrink:0; }
+
+  /* ---------- Search + Focus chip row ---------- */
+  .left-controls{
+    position: fixed;
+    top: 68px;
+    left: 16px;
+    right: 16px;
+    z-index: 20;
+    display:flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items:center;
+    pointer-events: none;
+  }
+  .left-controls > *{ pointer-events: auto; }
+
   #searchInput{
-    width: 240px;
+    width: 220px;
+    max-width: 60vw;
     padding: 10px 14px;
     border-radius: 12px;
     border: 1px solid var(--panel-border);
@@ -139,8 +193,41 @@
   #searchInput::placeholder{ color: var(--text-lo); }
   #searchInput:focus{
     box-shadow: 0 0 0 1px var(--accent), 0 8px 24px rgba(97,218,251,0.25);
-    width: 280px;
   }
+
+  .focus-chip{
+    display: none;
+    align-items:center;
+    gap: 8px;
+    padding: 9px 8px 9px 14px;
+    border-radius: 999px;
+    background: rgba(97,218,251,0.12);
+    border: 1px solid rgba(97,218,251,0.4);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    color: var(--accent);
+    font-size: 12.5px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    max-width: min(360px, 60vw);
+  }
+  .focus-chip.show{ display:flex; }
+  .focus-chip .fc-label{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .focus-chip .fc-clear{
+    flex-shrink:0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: rgba(97,218,251,0.2);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    font-size: 12px;
+    transition: background .15s ease;
+  }
+  .focus-chip .fc-clear:hover{ background: rgba(97,218,251,0.4); }
 
   /* ---------- Info / Detail Panel (Glassmorphism) ---------- */
   #infoPanel{
@@ -158,7 +245,6 @@
     pointer-events: none;
   }
 
-  /* Desktop: right-side floating card */
   @media (min-width: 761px){
     #infoPanel{
       top: 16px;
@@ -176,13 +262,12 @@
     }
   }
 
-  /* Mobile: bottom sheet */
   @media (max-width: 760px){
     #infoPanel{
       left: 10px;
       right: 10px;
       bottom: 10px;
-      max-height: 55vh;
+      max-height: 50vh;
       transform: translateY(120%);
       border-radius: 20px;
     }
@@ -191,9 +276,10 @@
       opacity: 1;
       pointer-events: auto;
     }
-    .search-wrap{ top: auto; bottom: 16px; left: 50%; transform: translateX(-50%); }
-    #searchInput{ width: 70vw; }
-    #searchInput:focus{ width: 78vw; }
+    .tbtn .label{ display:none; }
+    .tbtn{ padding: 10px 11px; }
+    .brand .label{ display:none; }
+    #searchInput{ width: 46vw; }
   }
 
   .panel-header{
@@ -272,6 +358,16 @@
   }
   .field-value.id-value{ color: var(--accent-2); font-weight: 600; }
 
+  .group-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
   .badge-row{ display:flex; gap:6px; flex-wrap: wrap; margin-top: 4px; }
   .badge{
     font-size: 10.5px;
@@ -281,6 +377,12 @@
     border: 1px solid rgba(97,218,251,0.35);
     color: var(--accent);
     font-weight: 600;
+  }
+  .badge-clickable{ cursor: pointer; transition: all .15s ease; }
+  .badge-clickable:hover{
+    background: rgba(97,218,251,0.28);
+    border-color: var(--accent);
+    transform: translateY(-1px);
   }
 
   .placeholder-hint{
@@ -302,6 +404,9 @@
     0%, 70%{ opacity: 1; }
     100%{ opacity: 0; visibility: hidden; }
   }
+  @media (max-width: 760px){
+    .placeholder-hint{ left: 10px; right: 10px; bottom: auto; top: 116px; text-align:center; }
+  }
 
   /* Loading overlay */
   #loadingOverlay{
@@ -321,10 +426,24 @@
   @keyframes spin{ to{ transform: rotate(360deg); } }
   #loadingOverlay p{ color: var(--text-lo); font-size: 13px; letter-spacing: 0.5px; }
 
-  @media (max-width: 760px){
-    .toolbar{ top: 12px; left: 12px; right: 12px; }
-    .brand span.label{ display:none; }
+  /* ---------- Native vis-network tooltip, restyled ---------- */
+  div.vis-tooltip{
+    background: var(--panel-bg-solid) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5) !important;
+    padding: 10px 12px !important;
+    font-family: 'Inter', sans-serif !important;
+    color: var(--text-hi) !important;
+    white-space: normal !important;
+    max-width: 300px !important;
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+    backdrop-filter: blur(10px);
   }
+  .tt-head{ font-weight: 700; font-size: 13px; color: var(--text-hi); margin-bottom: 2px; word-break: break-word; }
+  .tt-kind{ font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); margin-bottom: 6px; font-weight: 700; }
+  .tt-body{ color: var(--text-lo); font-size: 12px; white-space: pre-wrap; }
 </style>
 </head>
 
@@ -341,13 +460,25 @@
     <span class="label">Dependency Graph</span>
   </div>
   <div class="toolbar-actions">
-    <div class="tbtn" id="physicsToggle" title="Toggle physics simulation">⚛ Physics</div>
-    <div class="tbtn" id="fitBtn" title="Fit graph to screen">⤢ Fit</div>
+    <div class="legend-wrap">
+      <div class="tbtn" id="legendToggle" title="Show legend">🎨<span class="label"> Legend</span></div>
+      <div class="legend-popover" id="legendPopover">
+        <div class="legend-title">Node types</div>
+        <div id="legendItems"></div>
+      </div>
+    </div>
+    <div class="tbtn" id="layoutToggle" title="Switch layout">🌳<span class="label"> Tree</span></div>
+    <div class="tbtn active" id="physicsToggle" title="Toggle physics simulation">⚛<span class="label"> Physics</span></div>
+    <div class="tbtn" id="fitBtn" title="Fit graph to screen">⤢<span class="label"> Fit</span></div>
   </div>
 </div>
 
-<div class="search-wrap">
-  <input id="searchInput" type="text" placeholder="🔍 Search node / module…" autocomplete="off" />
+<div class="left-controls">
+  <input id="searchInput" type="text" placeholder="🔍 Search node…" autocomplete="off" />
+  <div class="focus-chip" id="focusChip">
+    <span class="fc-label" id="focusChipLabel">Focused</span>
+    <span class="fc-clear" id="focusChipClear" title="Clear focus">✕</span>
+  </div>
 </div>
 
 <div id="mynetwork"></div>
@@ -358,6 +489,9 @@
     <div class="panel-close" id="panelClose">✕</div>
   </div>
   <div class="panel-body">
+    <div class="field-label">Type</div>
+    <div id="panelGroup"><span class="group-badge">—</span></div>
+
     <div class="field-label">ID</div>
     <div class="field-value id-value" id="panelId">—</div>
 
@@ -372,7 +506,7 @@
   </div>
 </div>
 
-<div class="placeholder-hint">💡 Click any node to inspect it · Drag to pan · Scroll to zoom</div>
+<div class="placeholder-hint" id="placeholderHint">💡 Click a node to explore it · Double-click to expand further</div>
 
 <script type="text/javascript">
   // -----------------------------------------------------------------
@@ -385,170 +519,345 @@
   var data = { nodes: nodes, edges: edges };
 
   // -----------------------------------------------------------------
-  // VIS.JS OPTIONS — dark theme, smooth physics, glow-on-hover
+  // VISUAL LANGUAGE — one style per semantic group produced by
+  // graph_generator.py ('entry','file','external','symbol','class').
+  // Unknown/future groups fall back to GROUP_STYLES.default.
+  // -----------------------------------------------------------------
+  var GROUP_STYLES = {
+    entry:    { shape:'star',    color:'#fbbf24', border:'#f59e0b', font:'#fef3c7', glow:'rgba(251,191,36,0.6)',  label:'Entry point' },
+    file:     { shape:'dot',     color:'#60a5fa', border:'#3b82f6', font:'#dbeafe', glow:'rgba(96,165,250,0.5)',  label:'Project file' },
+    external: { shape:'dot',     color:'#64748b', border:'#475569', font:'#cbd5e1', glow:'rgba(100,116,139,0.35)',label:'External / stdlib', dashed:true },
+    symbol:   { shape:'dot',     color:'#a78bfa', border:'#8b5cf6', font:'#ede9fe', glow:'rgba(167,139,250,0.5)', label:'Function / method' },
+    class:    { shape:'diamond', color:'#34d399', border:'#10b981', font:'#d1fae5', glow:'rgba(52,211,153,0.5)',  label:'Class' },
+    default:  { shape:'dot',     color:'#22d3ee', border:'#06b6d4', font:'#cffafe', glow:'rgba(34,211,238,0.5)',  label:'Node' }
+  };
+  function styleFor(group){ return GROUP_STYLES[group] || GROUP_STYLES.default; }
+
+  // -----------------------------------------------------------------
+  // SMALL HELPERS
+  // -----------------------------------------------------------------
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function stripHtml(html){
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    return tmp.textContent || tmp.innerText || '';
+  }
+  function truncate(str, n){
+    if (!str) return str;
+    return str.length > n ? str.slice(0, n).trim() + '…' : str;
+  }
+  // Fully-qualified dotted paths (e.g. "pkg.module.thing") are hard to
+  // read at a glance — show just the last segment on the canvas and
+  // keep the full path available in the tooltip and side panel.
+  function humanizeLabel(label){
+    if (!label) return label;
+    var dotCount = (label.match(/\./g) || []).length;
+    if (dotCount >= 2) {
+      var parts = label.split('.');
+      return parts[parts.length - 1];
+    }
+    if (label.length > 24) {
+      return label.slice(0, 14) + '…' + label.slice(-7);
+    }
+    return label;
+  }
+  function shapeSVG(shape, color){
+    var c = color || '#61dafb';
+    switch(shape){
+      case 'star':
+        return '<svg width="14" height="14" viewBox="0 0 24 24"><polygon points="12,2 14.9,9.1 22.5,9.4 16.5,14.3 18.6,21.6 12,17.3 5.4,21.6 7.5,14.3 1.5,9.4 9.1,9.1" fill="'+c+'"/></svg>';
+      case 'diamond':
+        return '<svg width="14" height="14" viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" fill="'+c+'"/></svg>';
+      case 'triangle':
+        return '<svg width="14" height="14" viewBox="0 0 24 24"><polygon points="12,3 22,21 2,21" fill="'+c+'"/></svg>';
+      case 'box': case 'square':
+        return '<svg width="14" height="14" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="'+c+'"/></svg>';
+      default:
+        return '<svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="'+c+'"/></svg>';
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // PREPROCESS NODES — shorten labels for the canvas, keep full name +
+  // full docstring available for the tooltip / side panel.
+  // -----------------------------------------------------------------
+  function preprocessNodes(){
+    var updates = nodes.getIds().map(function(id){
+      var n = nodes.get(id);
+      var fullLabel = n.label != null ? String(n.label) : String(n.id);
+      var shortLabel = humanizeLabel(fullLabel);
+      var style = styleFor(n.group);
+      var rawTitle = n.title || '';
+      var bodyText = truncate(stripHtml(rawTitle), 280);
+      var newTitle =
+        '<div class="tt-head">' + escapeHtml(fullLabel) + '</div>' +
+        '<div class="tt-kind">' + escapeHtml(style.label) + '</div>' +
+        (bodyText ? '<div class="tt-body">' + escapeHtml(bodyText) + '</div>' : '');
+      return { id: id, label: shortLabel, fullLabel: fullLabel, fullDetails: rawTitle, title: newTitle };
+    });
+    nodes.update(updates);
+  }
+
+  // -----------------------------------------------------------------
+  // GRAPH META — degree + adjacency, used for sizing and focus mode
+  // -----------------------------------------------------------------
+  var degree = new Map();
+  var adjacency = new Map();
+  var hubThreshold = 2;
+
+  function computeGraphMeta(){
+    nodes.getIds().forEach(function(id){
+      degree.set(id, 0);
+      adjacency.set(id, { neighbors: new Set(), edgeIds: new Set() });
+    });
+    edges.get().forEach(function(e){
+      if (!adjacency.has(e.from) || !adjacency.has(e.to)) return;
+      degree.set(e.from, (degree.get(e.from) || 0) + 1);
+      degree.set(e.to, (degree.get(e.to) || 0) + 1);
+      adjacency.get(e.from).neighbors.add(e.to);
+      adjacency.get(e.from).edgeIds.add(e.id);
+      adjacency.get(e.to).neighbors.add(e.from);
+      adjacency.get(e.to).edgeIds.add(e.id);
+    });
+    var degVals = Array.from(degree.values());
+    var avgDeg = degVals.reduce(function(a,b){ return a+b; }, 0) / (degVals.length || 1);
+    hubThreshold = Math.max(2, Math.ceil(avgDeg));
+  }
+
+  // -----------------------------------------------------------------
+  // STYLE STATES
+  //   overview -> everything visible, labels only on hub/entry nodes
+  //   focus    -> clicked node + neighbors lit up, everything else dim
+  // -----------------------------------------------------------------
+  function applyOverviewStyle(){
+    var nodeUpdates = nodes.getIds().map(function(id){
+      var n = nodes.get(id);
+      var style = styleFor(n.group);
+      var d = degree.get(id) || 0;
+      var isEntry = n.group === 'entry';
+      var showLabel = isEntry || d >= hubThreshold;
+      return {
+        id: id,
+        shape: style.shape,
+        color: {
+          background: style.color,
+          border: style.border,
+          highlight: { background: style.color, border: '#ffffff' },
+          hover: { background: style.color, border: '#ffffff' }
+        },
+        borderWidth: isEntry ? 3 : 2,
+        opacity: 0.92,
+        value: d + (isEntry ? 3 : 1),
+        font: { size: showLabel ? 13 : 0, color: style.font, face: 'Inter, sans-serif', strokeWidth: 0 },
+        shapeProperties: { borderDashes: style.dashed ? [4,3] : false },
+        shadow: { enabled: isEntry, color: style.glow, size: 14, x: 0, y: 0 }
+      };
+    });
+    nodes.update(nodeUpdates);
+
+    var edgeUpdates = edges.get().map(function(e){
+      return {
+        id: e.id,
+        color: { color: 'rgba(148,163,184,0.38)', highlight: '#61dafb', hover: '#7ee3ff', opacity: 1, inherit: false },
+        width: 1.3
+      };
+    });
+    edges.update(edgeUpdates);
+  }
+
+  var currentFocus = null;
+
+  function enterFocus(nodeId, opts){
+    opts = opts || {};
+    var info = adjacency.get(nodeId);
+    if (!info) return;
+    var focusSet = new Set(info.neighbors);
+    focusSet.add(nodeId);
+    if (opts.twoHop){
+      info.neighbors.forEach(function(nb){
+        var nbInfo = adjacency.get(nb);
+        if (nbInfo) nbInfo.neighbors.forEach(function(x){ focusSet.add(x); });
+      });
+    }
+
+    var nodeUpdates = nodes.getIds().map(function(id){
+      var n = nodes.get(id);
+      var style = styleFor(n.group);
+      var inFocus = focusSet.has(id);
+      var isCenter = id === nodeId;
+      return {
+        id: id,
+        opacity: inFocus ? 1 : 0.08,
+        borderWidth: isCenter ? 4 : (inFocus ? 2.5 : 1),
+        font: { size: inFocus ? 13 : 0, color: style.font, face: 'Inter, sans-serif', strokeWidth: 0 },
+        shadow: inFocus
+          ? { enabled: true, color: isCenter ? style.glow : 'rgba(97,218,251,0.3)', size: isCenter ? 22 : 10, x: 0, y: 0 }
+          : { enabled: false }
+      };
+    });
+    nodes.update(nodeUpdates);
+
+    var edgeUpdates = edges.get().map(function(e){
+      var active = focusSet.has(e.from) && focusSet.has(e.to);
+      return {
+        id: e.id,
+        color: active
+          ? { color: '#61dafb', opacity: 0.95, highlight: '#61dafb', hover: '#7ee3ff', inherit: false }
+          : { color: 'rgba(51,65,85,0.5)', opacity: 0.05, inherit: false },
+        width: active ? 2.2 : 1
+      };
+    });
+    edges.update(edgeUpdates);
+
+    network.fit({ nodes: Array.from(focusSet), animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+    currentFocus = nodeId;
+    updateFocusChip();
+  }
+
+  function clearFocus(){
+    if (currentFocus === null) return;
+    applyOverviewStyle();
+    currentFocus = null;
+    updateFocusChip();
+    network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+    clampZoom(550);
+  }
+
+  function updateFocusChip(){
+    var chip = document.getElementById('focusChip');
+    var label = document.getElementById('focusChipLabel');
+    if (currentFocus !== null){
+      var n = nodes.get(currentFocus);
+      label.textContent = 'Focused: ' + (n ? (n.fullLabel || n.label) : currentFocus);
+      chip.classList.add('show');
+    } else {
+      chip.classList.remove('show');
+    }
+  }
+
+  function clampZoom(delay){
+    setTimeout(function(){
+      var scale = network.getScale();
+      if (scale < 0.6) network.moveTo({ scale: 0.6, animation: { duration: 250 } });
+      else if (scale > 1.7) network.moveTo({ scale: 1.7, animation: { duration: 250 } });
+    }, delay || 0);
+  }
+
+  // -----------------------------------------------------------------
+  // LAYOUT — hierarchical by default. Direction follows the natural
+  // flow of the data (importer -> import, caller -> callee,
+  // parent -> child), which reads top-to-bottom / left-to-right.
+  // A "Force" mode is offered as an organic alternative.
+  // -----------------------------------------------------------------
+  var currentLayout = 'hierarchical';
+
+  function getLayoutPhysicsOptions(mode){
+    var narrow = window.innerWidth < 761;
+    if (mode === 'hierarchical'){
+      return {
+        layout: {
+          hierarchical: {
+            enabled: true,
+            direction: narrow ? 'UD' : 'LR',
+            sortMethod: 'directed',
+            levelSeparation: narrow ? 120 : 170,
+            nodeSpacing: 100,
+            treeSpacing: 150,
+            blockShifting: true,
+            edgeMinimization: true,
+            parentCentralization: true
+          }
+        },
+        physics: {
+          enabled: true,
+          solver: 'hierarchicalRepulsion',
+          hierarchicalRepulsion: { nodeDistance: 130, centralGravity: 0, springLength: 130, springConstant: 0.03, damping: 0.5, avoidOverlap: 0.7 },
+          stabilization: { enabled: true, iterations: 200, updateInterval: 25 }
+        }
+      };
+    }
+    return {
+      layout: { hierarchical: { enabled: false }, improvedLayout: true, randomSeed: 42 },
+      physics: {
+        enabled: true,
+        solver: 'barnesHut',
+        barnesHut: { gravitationalConstant: -16000, centralGravity: 0.3, springLength: 150, springConstant: 0.04, damping: 0.45, avoidOverlap: 0.8 },
+        stabilization: { enabled: true, iterations: 250, updateInterval: 25 }
+      }
+    };
+  }
+
+  // -----------------------------------------------------------------
+  // BASE OPTIONS
   // -----------------------------------------------------------------
   var options = {
     autoResize: true,
     height: '100%',
     width: '100%',
-    layout: {
-      improvedLayout: true,
-      randomSeed: 42
-    },
     nodes: {
-      shape: 'dot',
-      size: 16,
-      borderWidth: 2,
       borderWidthSelected: 4,
-      font: {
-        color: '#e6edf3',
-        size: 14,
-        face: 'Inter, sans-serif',
-        strokeWidth: 0,
-        vadjust: -2
-      },
-      color: {
-        background: '#61dafb',
-        border: '#2c9fc9',
-        highlight: { background: '#a78bfa', border: '#7c5cf2' },
-        hover: { background: '#7ee3ff', border: '#61dafb' }
-      },
-      shadow: {
-        enabled: true,
-        color: 'rgba(97,218,251,0.35)',
-        size: 15,
-        x: 0,
-        y: 0
-      },
-      scaling: {
-        min: 10,
-        max: 34
-      }
+      scaling: { min: 14, max: 42, label: { enabled: false } },
+      shadow: { enabled: false },
+      chosen: true
     },
     edges: {
-      width: 1.4,
-      color: {
-        color: 'rgba(139,148,158,0.55)',
-        highlight: '#a78bfa',
-        hover: '#61dafb',
-        opacity: 0.8
-      },
-      smooth: {
-        enabled: true,
-        type: 'continuous',
-        roundness: 0.55
-      },
-      arrows: {
-        to: { enabled: true, scaleFactor: 0.55, type: 'arrow' }
-      },
-      shadow: {
-        enabled: false
-      },
-      selectionWidth: 2,
-      hoverWidth: 1.6
+      smooth: { enabled: true, type: 'continuous', roundness: 0.55 },
+      arrows: { to: { enabled: true, scaleFactor: 0.55, type: 'arrow' } },
+      font: { color: '#8b949e', size: 10, strokeWidth: 0, align: 'top', background: 'rgba(13,17,23,0.75)' },
+      selectionWidth: 1.5,
+      hoverWidth: 1.2
     },
     interaction: {
       hover: true,
       tooltipDelay: 120,
       hideEdgesOnDrag: true,
-      hideEdgesOnZoom: true,
+      hideEdgesOnZoom: false,
       navigationButtons: false,
       keyboard: { enabled: true, bindToWindow: false },
-      multiselect: true,
+      multiselect: false,
       zoomView: true,
       dragView: true
-    },
-    physics: {
-      enabled: true,
-      solver: 'barnesHut',
-      barnesHut: {
-        gravitationalConstant: -18000,
-        centralGravity: 0.35,
-        springLength: 140,
-        springConstant: 0.045,
-        damping: 0.4,
-        avoidOverlap: 0.6
-      },
-      stabilization: {
-        enabled: true,
-        iterations: 250,
-        updateInterval: 25
-      }
-    },
-    groups: {
-      file: {
-        shape: 'box',
-        color: {
-          background: 'rgba(21, 27, 38, 0.85)',
-          border: '#3b82f6',
-          highlight: { background: 'rgba(59, 130, 246, 0.25)', border: '#60a5fa' },
-          hover: { background: 'rgba(59, 130, 246, 0.35)', border: '#3b82f6' }
-        },
-        font: { face: 'monospace', size: 14, color: '#f8fafc' },
-        borderWidth: 2,
-        margin: 10
-      },
-      class: {
-        shape: 'box',
-        color: {
-          background: 'rgba(21, 27, 38, 0.85)',
-          border: '#10b981',
-          highlight: { background: 'rgba(16, 185, 129, 0.25)', border: '#34d399' },
-          hover: { background: 'rgba(16, 185, 129, 0.35)', border: '#10b981' }
-        },
-        font: { face: 'monospace', size: 14, color: '#f8fafc' },
-        borderWidth: 2,
-        margin: 10
-      },
-      symbol: {
-        shape: 'box',
-        color: {
-          background: 'rgba(21, 27, 38, 0.85)',
-          border: '#8b5cf6',
-          highlight: { background: 'rgba(139, 92, 246, 0.25)', border: '#a78bfa' },
-          hover: { background: 'rgba(139, 92, 246, 0.35)', border: '#8b5cf6' }
-        },
-        font: { face: 'monospace', size: 14, color: '#f8fafc' },
-        borderWidth: 2,
-        margin: 10
-      },
-      entry: {
-        shape: 'box',
-        color: {
-          background: 'rgba(239, 68, 68, 0.25)',
-          border: '#ef4444',
-          highlight: { background: 'rgba(239, 68, 68, 0.35)', border: '#f87171' },
-          hover: { background: 'rgba(239, 68, 68, 0.45)', border: '#ef4444' }
-        },
-        font: { face: 'monospace', size: 16, color: '#f8fafc' },
-        borderWidth: 3,
-        margin: 12
-      },
-      external: {
-        shape: 'dot',
-        size: 10,
-        color: {
-          background: '#475569',
-          border: '#64748b',
-          highlight: { background: '#64748b', border: '#94a3b8' },
-          hover: { background: '#64748b', border: '#64748b' }
-        },
-        font: { size: 11, color: '#94a3b8' }
-      }
     }
   };
+  var initialLayoutOpts = getLayoutPhysicsOptions('hierarchical');
+  options.layout = initialLayoutOpts.layout;
+  options.physics = initialLayoutOpts.physics;
+
+  // -----------------------------------------------------------------
+  // BUILD
+  // -----------------------------------------------------------------
+  preprocessNodes();
+  computeGraphMeta();
+  applyOverviewStyle();
 
   var network = new vis.Network(container, data, options);
 
   // -----------------------------------------------------------------
-  // LOADING OVERLAY — hide once physics stabilizes
+  // LEGEND
   // -----------------------------------------------------------------
-  network.once('stabilizationIterationsDone', function () {
-    finishLoading();
-  });
-  // Fallback in case graph is tiny / physics disabled and event never fires
-  setTimeout(finishLoading, 3000);
+  function buildLegend(){
+    var groupsPresent = new Set();
+    nodes.get().forEach(function(n){ groupsPresent.add(n.group || 'default'); });
+    var container = document.getElementById('legendItems');
+    container.innerHTML = '';
+    groupsPresent.forEach(function(g){
+      var style = styleFor(g);
+      var row = document.createElement('div');
+      row.className = 'legend-row';
+      row.innerHTML = shapeSVG(style.shape, style.color) + '<span>' + escapeHtml(style.label) + '</span>';
+      container.appendChild(row);
+    });
+  }
+  buildLegend();
 
+  // -----------------------------------------------------------------
+  // LOADING OVERLAY — hide once physics stabilizes, and clamp zoom
+  // so the graph doesn't land too small on screen.
+  // -----------------------------------------------------------------
   var loadingDone = false;
   function finishLoading(){
     if (loadingDone) return;
@@ -558,36 +867,44 @@
     overlay.style.visibility = 'hidden';
     setTimeout(function(){ overlay.style.display = 'none'; }, 400);
   }
+  network.once('stabilizationIterationsDone', function(){
+    network.fit({ animation: false });
+    var scale = network.getScale();
+    if (scale < 0.6) network.moveTo({ scale: 0.6 });
+    else if (scale > 1.7) network.moveTo({ scale: 1.7 });
+    finishLoading();
+  });
+  setTimeout(finishLoading, 4000);
 
   // -----------------------------------------------------------------
   // INFO PANEL LOGIC
   // -----------------------------------------------------------------
-  var infoPanel   = document.getElementById('infoPanel');
+  var infoPanel    = document.getElementById('infoPanel');
   var panelTitle   = document.getElementById('panelTitle');
+  var panelGroup   = document.getElementById('panelGroup');
   var panelId      = document.getElementById('panelId');
   var panelLabel   = document.getElementById('panelLabel');
   var panelDetails = document.getElementById('panelDetails');
   var panelConns   = document.getElementById('panelConnections');
   var panelClose   = document.getElementById('panelClose');
 
-  function stripHtml(html){
-    var tmp = document.createElement('div');
-    tmp.innerHTML = html || '';
-    return tmp.textContent || tmp.innerText || '';
-  }
-
   function openPanelForNode(nodeId){
     var node = nodes.get(nodeId);
     if (!node) return;
+    var style = styleFor(node.group);
+    var displayName = node.fullLabel || node.label || String(node.id);
 
-    panelTitle.textContent = node.label || String(node.id);
+    panelTitle.textContent = displayName;
+    panelGroup.innerHTML = '<span class="group-badge" style="background:' + style.color + '22; color:' + style.color + '; border:1px solid ' + style.color + '55;">' +
+      shapeSVG(style.shape, style.color) + ' ' + escapeHtml(style.label) + '</span>';
     panelId.textContent = node.id;
-    panelLabel.textContent = node.label || '(no label)';
+    panelLabel.textContent = displayName;
 
-    var rawTitle = node.title !== undefined && node.title !== null ? node.title : '(no docstring / details available)';
-    panelDetails.textContent = stripHtml(rawTitle);
+    var rawDetails = (node.fullDetails !== undefined && node.fullDetails !== null && node.fullDetails !== '')
+      ? node.fullDetails
+      : '(no docstring / details available)';
+    panelDetails.textContent = stripHtml(rawDetails);
 
-    // Connected nodes as badges
     panelConns.innerHTML = '';
     var connected = network.getConnectedNodes(nodeId);
     if (connected.length === 0) {
@@ -599,8 +916,14 @@
       connected.slice(0, 25).forEach(function (cid) {
         var cnode = nodes.get(cid);
         var span = document.createElement('span');
-        span.className = 'badge';
-        span.textContent = (cnode && cnode.label) ? cnode.label : String(cid);
+        span.className = 'badge badge-clickable';
+        span.textContent = cnode ? (cnode.fullLabel || cnode.label) : String(cid);
+        span.title = 'Click to focus this node';
+        span.addEventListener('click', function(){
+          network.selectNodes([cid]);
+          enterFocus(cid);
+          openPanelForNode(cid);
+        });
         panelConns.appendChild(span);
       });
       if (connected.length > 25) {
@@ -618,78 +941,50 @@
     infoPanel.classList.remove('open');
   }
 
-  var originalNodes = null;
-  var originalEdges = null;
-
-  function highlightNeighborhood(selectedNodeId) {
-    if (!originalNodes) {
-      originalNodes = nodes.get();
-      originalEdges = edges.get();
-    }
-
-    var connectedNodes = network.getConnectedNodes(selectedNodeId);
-    var allNodesToHighlight = new Set(connectedNodes);
-    allNodesToHighlight.add(selectedNodeId);
-
-    var updatedNodes = originalNodes.map(function(node) {
-      if (allNodesToHighlight.has(node.id)) {
-        return { id: node.id, opacity: 1.0 };
-      } else {
-        return { id: node.id, opacity: 0.15 };
-      }
-    });
-
-    var updatedEdges = originalEdges.map(function(edge) {
-      if (edge.from === selectedNodeId || edge.to === selectedNodeId) {
-        return { id: edge.id, opacity: 0.9, width: 2.5 };
-      } else {
-        return { id: edge.id, opacity: 0.05 };
-      }
-    });
-
-    nodes.update(updatedNodes);
-    edges.update(updatedEdges);
-  }
-
-  function resetHighlighting() {
-    if (originalNodes) {
-      nodes.update(originalNodes.map(function(node) {
-        return { id: node.id, opacity: 1.0 };
-      }));
-      edges.update(originalEdges.map(function(edge) {
-        return { id: edge.id, opacity: 0.8, width: 1.4 };
-      }));
-      originalNodes = null;
-      originalEdges = null;
-    }
-  }
-
-  network.on('click', function (params) {
-    if (params.nodes.length > 0) {
-      var selectedNode = params.nodes[0];
-      openPanelForNode(selectedNode);
-      network.focus(selectedNode, {
-        scale: 1.1,
-        animation: { duration: 500, easingFunction: 'easeInOutQuad' }
-      });
-      highlightNeighborhood(selectedNode);
-    } else {
-      closePanel();
-      resetHighlighting();
-    }
-  });
-
   panelClose.addEventListener('click', closePanel);
 
   // -----------------------------------------------------------------
-  // HOVER GLOW EFFECT (extra visual polish)
+  // CLICK / DOUBLE-CLICK — the core "click to reveal more" interaction
   // -----------------------------------------------------------------
+  network.on('click', function (params) {
+    if (params.nodes.length > 0) {
+      var id = params.nodes[0];
+      enterFocus(id);
+      openPanelForNode(id);
+    } else if (params.edges.length > 0) {
+      var e = edges.get(params.edges[0]);
+      enterFocus(e.from);
+      openPanelForNode(e.from);
+    } else {
+      clearFocus();
+      closePanel();
+    }
+  });
+
+  network.on('doubleClick', function (params) {
+    if (params.nodes.length > 0) {
+      var id = params.nodes[0];
+      enterFocus(id, { twoHop: true });
+      openPanelForNode(id);
+    }
+  });
+
+  // Subtle hover emphasis on desktop, skipped while a focus is active
+  // so it doesn't fight the dim/highlight state.
+  var hoveredOriginal = null;
   network.on('hoverNode', function (params) {
     container.style.cursor = 'pointer';
-    network.updateEditMode && null;
+    if (currentFocus !== null) return;
+    var n = nodes.get(params.node);
+    hoveredOriginal = { id: params.node, borderWidth: n.borderWidth };
+    nodes.update({ id: params.node, borderWidth: (n.borderWidth || 2) + 2 });
   });
   network.on('blurNode', function () {
     container.style.cursor = 'default';
+    if (hoveredOriginal) {
+      nodes.update({ id: hoveredOriginal.id, borderWidth: hoveredOriginal.borderWidth });
+      hoveredOriginal = null;
+    }
   });
 
   // -----------------------------------------------------------------
@@ -697,7 +992,6 @@
   // -----------------------------------------------------------------
   var physicsEnabled = true;
   var physicsBtn = document.getElementById('physicsToggle');
-  physicsBtn.classList.add('active');
 
   physicsBtn.addEventListener('click', function () {
     physicsEnabled = !physicsEnabled;
@@ -706,11 +1000,54 @@
   });
 
   document.getElementById('fitBtn').addEventListener('click', function () {
-    network.fit({ animation: { duration: 700, easingFunction: 'easeInOutQuad' } });
+    if (currentFocus !== null) {
+      var info = adjacency.get(currentFocus);
+      var set = info ? Array.from(info.neighbors).concat([currentFocus]) : undefined;
+      network.fit({ nodes: set, animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+    } else {
+      network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+    }
+    clampZoom(650);
+  });
+
+  var layoutBtn = document.getElementById('layoutToggle');
+  function setLayoutButtonLabel(){
+    layoutBtn.innerHTML = currentLayout === 'hierarchical'
+      ? '🌳<span class="label"> Tree</span>'
+      : '🌐<span class="label"> Force</span>';
+  }
+  function applyLayout(mode){
+    currentLayout = mode;
+    network.setOptions(getLayoutPhysicsOptions(mode));
+    network.once('stabilizationIterationsDone', function(){
+      network.fit({ animation: { duration: 400 } });
+      clampZoom(450);
+    });
+  }
+  layoutBtn.addEventListener('click', function () {
+    applyLayout(currentLayout === 'hierarchical' ? 'force' : 'hierarchical');
+    setLayoutButtonLabel();
+  });
+
+  // Legend popover toggle
+  var legendWrap = document.querySelector('.legend-wrap');
+  var legendPopover = document.getElementById('legendPopover');
+  document.getElementById('legendToggle').addEventListener('click', function (e) {
+    e.stopPropagation();
+    legendPopover.classList.toggle('open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!legendWrap.contains(e.target)) legendPopover.classList.remove('open');
+  });
+
+  // Focus chip clear button
+  document.getElementById('focusChipClear').addEventListener('click', function(){
+    clearFocus();
+    closePanel();
   });
 
   // -----------------------------------------------------------------
-  // SEARCH — focus + highlight matching node
+  // SEARCH — finds by full name or id, then enters focus mode on it
   // -----------------------------------------------------------------
   var searchInput = document.getElementById('searchInput');
   var searchTimeout;
@@ -723,16 +1060,13 @@
     searchTimeout = setTimeout(function () {
       var allNodes = nodes.get();
       var match = allNodes.find(function (n) {
-        return (n.label && n.label.toLowerCase().includes(query)) ||
-               (String(n.id).toLowerCase().includes(query));
+        var hay = ((n.fullLabel || n.label || '') + ' ' + String(n.id)).toLowerCase();
+        return hay.includes(query);
       });
 
       if (match) {
         network.selectNodes([match.id]);
-        network.focus(match.id, {
-          scale: 1.2,
-          animation: { duration: 600, easingFunction: 'easeInOutQuad' }
-        });
+        enterFocus(match.id);
         openPanelForNode(match.id);
       }
     }, 250);
@@ -742,6 +1076,16 @@
     if (e.key === 'Escape') {
       searchInput.value = '';
       searchInput.blur();
+      clearFocus();
+      closePanel();
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.activeElement !== searchInput) {
+      legendPopover.classList.remove('open');
+      closePanel();
+      clearFocus();
     }
   });
 

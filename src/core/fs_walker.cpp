@@ -23,7 +23,10 @@ const std::unordered_set<std::string> IGNORED_DIRS = {
     "bin", "obj", ".vs", "out", "build",
     
     // Rust & Go
-    "target", "vendor"
+    "target", "vendor",
+    
+    // AI Context Noise
+    "coverage_reports_cpp", "lib", "docs", "tests", "third_party", "vendor"
 };
 
 bool should_skip(const std::string& dir_name) {
